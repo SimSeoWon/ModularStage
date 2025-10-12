@@ -21,20 +21,18 @@ public:
 	virtual void StartupModule() override;
 	virtual void ShutdownModule() override;
 
-
-	UFUNCTION()
-	void OnClicked_Menu();
-
 	UFUNCTION()
 	TSharedRef<SDockTab> CreateTabWidget(const FSpawnTabArgs& Args);
 
 	UFUNCTION()
 	void OnWorldCleanup(UWorld* World, bool bSessionEnded, bool bCleanupResources);
 
+protected:
+	void SetEditorMenu();
+
 public:
 	static FName TabName;
 
 protected:
-	
 	TSharedPtr<FEditorMenuHelper> MenuHelper;
 };

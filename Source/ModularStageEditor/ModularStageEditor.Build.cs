@@ -39,12 +39,14 @@ public class ModularStageEditor : ModuleRules
                 "AnimationSharing",
                 "NiagaraAnimNotifies",
                 "SkeletalMeshUtilitiesCommon",
+                "ContentBrowser",
                 "ContentBrowserData",
                 "ScriptableEditorWidgets",
                 "NavigationSystem",
                 "StaticMeshDescription",
                 "MeshDescription",
                 "AssetManagerEditor",
+                "BlueprintEditorLibrary",
             });
 
 		PrivateDependencyModuleNames.AddRange(new string[] 
@@ -87,7 +89,8 @@ public class ModularStageEditor : ModuleRules
                 "DerivedDataCache",
                 "Synthesis",
                 "DeveloperSettings",
-                "Persona", });
+                "Persona",
+                "ContentBrowser", });
 
         // Uncomment if you are using Slate UI
         // PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });

@@ -4,8 +4,7 @@
 #include "ToolMenu.h"
 #include "ToolMenus.h"
 
-FName FEditorMenuHelper::base_menu_name = FName("LevelEditor.MainMenu.XXXX");
-
+FName FEditorMenuHelper::base_menu_name = FName("LevelEditor.MainMenu.ModularStage");
 
 void FEditorMenuHelper::InitMenu()
 {
@@ -18,11 +17,9 @@ void FEditorMenuHelper::InitMenu()
 	{
 		menu = toolMenus->ExtendMenu("LevelEditor.MainMenu");
 		FToolMenuSection& section = menu->FindOrAddSection(NAME_None);
-
-		FText label = FText::FromString(TEXT("XXXX"));
-		FText tooltip = FText::FromString(TEXT("XXXX"));
-		
-		FToolMenuEntry& entry = section.AddSubMenu("xxxx", label, tooltip, FNewToolMenuChoice());
+		FText label = FText::FromString(TEXT("ModularStage"));
+		FText tooltip = FText::FromString(TEXT("ModularStage"));
+		FToolMenuEntry& entry = section.AddSubMenu("ModularStage", label, tooltip, FNewToolMenuChoice());
 		entry.InsertPosition = FToolMenuInsert("Help", EToolMenuInsertType::After);
 		menu = toolMenus->RegisterMenu(base_menu_name);
 	}
