@@ -80,7 +80,6 @@ public class ModularStageEditor : ModuleRules
                 "MainFrame",
                 "WorldBrowser",
                 "MaterialEditor",
-                "Blutility",
                 "Niagara",
                 "MovieScene",
                 "MovieSceneTracks",

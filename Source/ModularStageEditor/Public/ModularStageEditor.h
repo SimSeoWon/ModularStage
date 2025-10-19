@@ -29,10 +29,13 @@ public:
 
 protected:
 	void SetEditorMenu();
+	void OnRegistration_WorkflowTab();
 
 public:
 	static FName TabName;
 
 protected:
 	TSharedPtr<FEditorMenuHelper> MenuHelper;
+
+	FDelegateHandle RegisterTabsDelegateHandle;
 };

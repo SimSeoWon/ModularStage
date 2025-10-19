@@ -19,9 +19,14 @@ public:
 
     virtual void ReleaseSlateResources(bool bReleaseChildren) override;
 
+    DECLARE_DELEGATE_OneParam(OnAssetSelectedDelegate, const FAssetData&)
+    OnAssetSelectedDelegate& GetOnAssetSelected() { return OnAssetSelected; }
+    
 private:
     void HandleAssetSelected(const FAssetData& AssetData);
 
 protected:
     TSharedPtr<SWidget> AssetPickerWidget;
+
+    OnAssetSelectedDelegate OnAssetSelected;
 };

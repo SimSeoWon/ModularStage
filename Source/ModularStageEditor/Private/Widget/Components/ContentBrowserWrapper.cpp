@@ -32,5 +32,8 @@ TSharedRef<SWidget> UContentBrowserWrapper::RebuildWidget()
 
 void UContentBrowserWrapper::HandleAssetSelected(const FAssetData& AssetData)
 {
-    //OnAssetSelected.Broadcast(AssetData);
+    if (false == OnAssetSelected.IsBound())
+        return;
+
+    OnAssetSelected.Execute(AssetData);
 }
