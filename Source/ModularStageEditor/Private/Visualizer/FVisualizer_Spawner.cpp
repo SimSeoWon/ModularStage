@@ -42,7 +42,7 @@ void FVisualizer_Spawner::DrawVisualization(const UActorComponent* Component, co
 		const FVector WorldSpawnPoint = ComponentTransform.TransformPosition(SpawnPoint);
 
 		PDI->SetHitProxy(new HSpawnerVisProxy(SpawnerComponent, i, SpawnerPointType::Spawn));
-		DrawWireSphere(PDI, WorldSpawnPoint, FLinearColor::Blue, 20.f, 12, SDPG_World);
+		DrawWireSphere(PDI, WorldSpawnPoint, FLinearColor::Blue, 20.f, 12, SDPG_Foreground);
 		PDI->SetHitProxy(nullptr);
 	}
 
@@ -53,14 +53,14 @@ void FVisualizer_Spawner::DrawVisualization(const UActorComponent* Component, co
 		const FVector WorldPatrolPoint = ComponentTransform.TransformPosition(PatrolPoint);
 
 		PDI->SetHitProxy(new HSpawnerVisProxy(SpawnerComponent, i, SpawnerPointType::Patrol));
-		DrawWireSphere(PDI, WorldPatrolPoint, FLinearColor::Red, 20.f, 12, SDPG_World);
+		DrawWireSphere(PDI, WorldPatrolPoint, FLinearColor::Red, 20.f, 12, SDPG_Foreground);
 		PDI->SetHitProxy(nullptr);
 
 		if (i > 0)
 		{
 			const FVector& PrevPoint = SpawnerComponent->PatrolPoints[i - 1];
 			const FVector WorldPrevPoint = ComponentTransform.TransformPosition(PrevPoint);
-			PDI->DrawLine(WorldPrevPoint, WorldPatrolPoint, FLinearColor::Red, SDPG_World);
+			PDI->DrawLine(WorldPrevPoint, WorldPatrolPoint, FLinearColor::Red, SDPG_Foreground);
 		}
 	}
 }

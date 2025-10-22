@@ -3,12 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Components/SceneComponent.h"
+#include "Components/PrimitiveComponent.h"
+#include "PrimitiveSceneProxy.h"
 #include "MissionPropComponent.h"
 #include "MissionPropsComponent_Spawner.generated.h"
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
-class MODULARSTAGE_API UMissionPropsComponent_Spawner : public USceneComponent, public IMissionPropComponent
+class MODULARSTAGE_API UMissionPropsComponent_Spawner : public UPrimitiveComponent, public IMissionPropComponent
 {
 	GENERATED_BODY()
 
@@ -16,8 +17,16 @@ class MODULARSTAGE_API UMissionPropsComponent_Spawner : public USceneComponent, 
 	friend class FVisualizer_Spawner;
 #endif
 
+	friend class FSpawnerSceneProxy;
+
 public:
 	UMissionPropsComponent_Spawner();
+
+	virtual FPrimitiveSceneProxy* CreateSceneProxy() override;
+
+	// !! ì¤‘ìš”: FBoxSphereBounds GetBounds() const override; // <- UPrimitiveComponentëŠ” ì´ í•¨ìˆ˜ê°€ ì—†ìŒ
+	// !! FBoxSphereBounds CalcBounds(const FTransform& LocalToWorld) const override; ë¥¼ êµ¬í˜„í•´ì•¼ í•¨
+	virtual FBoxSphereBounds CalcBounds(const FTransform& LocalToWorld) const override;
 
 	//~ Begin IMissionPropComponent Interface
 	virtual void OnActivate() override;
@@ -28,7 +37,7 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	/** ÀÌ ¹öÆ°ÀÌ µðÅ×ÀÏ ÆÐ³Î¿¡ ³ªÅ¸³³´Ï´Ù. */
+	
 	UFUNCTION(CallInEditor, Category = "Spawner")
 	void ShowAsserBrowser();
 
@@ -41,4 +50,7 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawner", meta = (MakeEditWidget = true))
 	TArray<FVector> PatrolPoints;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawner", meta = (MakeEditWidget = true))
+	bool IsShowDebug = true;
 };

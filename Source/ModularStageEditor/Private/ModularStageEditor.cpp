@@ -56,7 +56,6 @@ void FModularStageEditor::StartupModule()
 	if (GUnrealEd)
 	{
 		TSharedRef<FComponentVisualizer> Visualizer = MakeShared<FVisualizer_Spawner>();
-
 		GUnrealEd->RegisterComponentVisualizer(UMissionPropsComponent_Spawner::StaticClass()->GetFName(), Visualizer);
 		Visualizer->OnRegister();
 	}
