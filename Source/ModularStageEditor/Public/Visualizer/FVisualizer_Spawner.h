@@ -11,6 +11,8 @@ struct HSpawnerVisProxy : public HComponentVisProxy
 	int32 PointIndex;
 	FName PointType; // "Spawn" or "Patrol"
 
+	
+
 	HSpawnerVisProxy(const UActorComponent* InComponent, int32 InPointIndex, FName InPointType)
 		:HComponentVisProxy(InComponent, HPP_Wireframe)
 	{

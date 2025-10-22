@@ -6,6 +6,7 @@
 #include "Components/PrimitiveComponent.h"
 #include "PrimitiveSceneProxy.h"
 #include "MissionPropComponent.h"
+#include "Engine/Texture2D.h" // UTexture2D를 사용하기 위해 Include 추가
 #include "MissionPropsComponent_Spawner.generated.h"
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
@@ -42,6 +43,11 @@ protected:
 	void ShowAsserBrowser();
 
 protected:
+
+	/** 컴포넌트를 뷰포트에서 나타낼 아이콘입니다. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Visual")
+	TObjectPtr<UTexture2D> SpriteIcon;
+
 	UPROPERTY(EditAnywhere, Category = "Spawner")
 	FString ResourcesPath;
 

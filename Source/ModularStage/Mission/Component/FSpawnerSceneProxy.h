@@ -17,6 +17,8 @@ public:
     SIZE_T GetAllocatedSize() const { return FPrimitiveSceneProxy::GetAllocatedSize(); }
 
 private:
+    
+    TObjectPtr<UTexture2D> SpriteIcon;
     TArray<FVector> SpawnPoints;
     TArray<FVector> PatrolPoints;
     bool IsShowDebug = true;

@@ -1,6 +1,8 @@
 #include "FSpawnerSceneProxy.h"
-#include "MissionPropsComponent_Spawner.h"
+#include "Engine/Engine.h" // GEngine 사용
 #include "SceneManagement.h"
+#include "TextureResource.h"
+#include "MissionPropsComponent_Spawner.h"
 
 SIZE_T FSpawnerSceneProxy::GetTypeHash() const
 {
@@ -15,6 +17,7 @@ FSpawnerSceneProxy::FSpawnerSceneProxy(const UMissionPropsComponent_Spawner* InC
     SpawnPoints.Append(InComponent->SpawnPoints);
     PatrolPoints.Append(InComponent->PatrolPoints);
     IsShowDebug = InComponent->IsShowDebug;
+    SpriteIcon = InComponent->SpriteIcon;
 }
 
 void FSpawnerSceneProxy::GetDynamicMeshElements(const TArray<const FSceneView*>& Views, const FSceneViewFamily& ViewFamily, uint32 VisibilityMap, FMeshElementCollector& Collector) const
@@ -24,12 +27,42 @@ void FSpawnerSceneProxy::GetDynamicMeshElements(const TArray<const FSceneView*>&
     // 프록시의 Local-to-World 트랜스폼 매트릭스를 가져옵니다.
     const FMatrix& localToWorld = GetLocalToWorld();
 
+    FTexture* TextureResource = nullptr;
+    if (SpriteIcon && SpriteIcon->GetResource())
+    {
+        TextureResource = SpriteIcon->GetResource();
+    }
+    else if (GEngine->DefaultTexture && GEngine->DefaultTexture->GetResource())
+    {
+        // 설정된 아이콘이 없으면 엔진 기본 아이콘 (S_Actor)을 사용합니다.
+        TextureResource = GEngine->DefaultTexture->GetResource();
+    }
+
     for (int32 ViewIndex = 0; ViewIndex < Views.Num(); ViewIndex++)
     {
         if (VisibilityMap & (1 << ViewIndex))
         {
             const FSceneView* View = Views[ViewIndex];
             FPrimitiveDrawInterface* PDI = Collector.GetPDI(ViewIndex);
+
+            // 2. 텍스처 리소스가 유효하면 그립니다.
+            if (TextureResource)
+            {
+                // 컴포넌트의 월드 위치를 가져옵니다.
+                const FVector SpriteLocation = localToWorld.GetOrigin();
+
+                // 기본 크기를 정합니다. (예: 32x32)
+                const float SpriteSize = 32.0f;
+
+                // 선택 상태에 따라 색상을 정합니다. (흰색이어야 텍스처 본연의 색이 나옴)
+                const FLinearColor SpriteColor = GetViewSelectionColor(
+                    FLinearColor::White, *View, IsSelected(), IsHovered(), false, IsIndividuallySelected()
+                );
+
+                // 스프라이트를 그립니다.
+                PDI->DrawSprite( SpriteLocation, SpriteSize, SpriteSize, TextureResource,
+                    SpriteColor, SDPG_World, 0.0f, 0.0f,  0.0f, 0.0f);
+            }
 
             // Draw SpawnPoints as red points
             for (const FVector& Point : SpawnPoints)
