@@ -15,6 +15,7 @@
 #include "Editor/UnrealEdEngine.h"
 #include "Visualizer/FVisualizer_Spawner.h"
 #include "Mission/Component/MissionPropsComponent_Spawner.h"
+#include "MeshGeneratorWidget.h"
 
 
 #define LOCTEXT_NAMESPACE "ModularStageEditor"
@@ -100,7 +101,9 @@ void FModularStageEditor::SetEditorMenu()
 
 		// Register the editor menus using the new template function
 		RegisterEditorMenu<UStagePresetEditor>(MenuHelper, TEXT("ModularStage"));
+		RegisterEditorMenu<UMeshGeneratorWidget>(MenuHelper, TEXT("MeshGenerator"));
 		RegisterEditorMenu<UEUW_InGameTask>(MenuHelper, TEXT("MissionTask"));
+		
 	}
 }
 

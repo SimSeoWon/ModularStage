@@ -3,6 +3,7 @@
 using System.Collections.Generic;
 using System.IO;
 using UnrealBuildTool;
+using UnrealBuildTool.Rules;
 
 public class ModularStage : ModuleRules
 {
@@ -22,6 +23,9 @@ public class ModularStage : ModuleRules
 			"EnhancedInput",
             "UnrealEd",
             "UMG",
+            "ProceduralMeshComponent",
+            "MeshDescription",
+            "StaticMeshDescription",
         });
 
         AddIncludePath(ref PrivateIncludePaths, "ModularStage");

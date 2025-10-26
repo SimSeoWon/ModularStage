@@ -3,9 +3,16 @@
 
 #include "MissionPrefab.h"
 #include "Components/SceneComponent.h"
+#include "Components/StaticMeshComponent.h"
 #include "Engine/World.h"
+
+#if WITH_EDITOR
 #include "Editor.h"
 #include "Editor/EditorEngine.h"
+#include "EditorUtilitySubsystem.h"
+#include "MeshGeneratorWidget.h"
+#endif
+
 #include "ScopedTransaction.h"
 
 #include "Component/ActorComponent_MissionTaskExecutor.h"
@@ -19,8 +26,13 @@ AMissionPrefab::AMissionPrefab()
 	// 프리팹의 위치, 회전, 크기를 담당할 루트 컴포넌트를 생성합니다.
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 
+	GeneratedMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("GeneratedMeshComponent"));
+	GeneratedMeshComponent->SetupAttachment(RootComponent);
+
 	/// 해당 프리팹이 수행할 미션태스크를 실행하는 컴포넌트.
 	MissionTaskExecutor = CreateDefaultSubobject<UActorComponent_MissionTaskExecutor>(TEXT("MissionTaskExecutor"));
+
+    ObstacleExtent = FVector(100.f, 100.f, 100.f);
 }
 
 // Called when the game starts or when spawned
@@ -37,8 +49,32 @@ void AMissionPrefab::Tick(float DeltaTime)
 
 }
 
+void AMissionPrefab::OpenMeshGenerator()
+{
+#if WITH_EDITOR
+    UEditorUtilitySubsystem* EditorUtilitySubsystem = GEditor->GetEditorSubsystem<UEditorUtilitySubsystem>();
+    if (!EditorUtilitySubsystem)
+    {
+        return;
+    }
+
+    const FString WidgetPath = UMeshGeneratorWidget::GetWidgetBlueprintPath();
+    UObject* WidgetBlueprint = LoadObject<UObject>(nullptr, *WidgetPath);
+
+    //if (WidgetBlueprint)
+    //{
+    //    UEditorUtilityWidget* SpawnedTab = EditorUtilitySubsystem->SpawnAndRegisterTab(WidgetBlueprint);
+    //    if (UMeshGeneratorWidget* SpawnedWidget = Cast<UMeshGeneratorWidget>(SpawnedTab))
+    //    {
+    //        SpawnedWidget->SetTargetPrefab(this);
+    //    }
+    //}
+#endif
+}
+
 void AMissionPrefab::UnpackForEditing()
 {
+#if WITH_EDITOR
 	UWorld* World = GetWorld();
 	if (!World || World->WorldType != EWorldType::Editor)
 	{
@@ -76,4 +112,5 @@ void AMissionPrefab::UnpackForEditing()
 	{
 		World->EditorDestroyActor(this, false);
 	}
+#endif
 }
