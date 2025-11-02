@@ -17,11 +17,29 @@ public:
 	// Sets default values for this actor's properties
 	AProceduralMeshPlayground(const FObjectInitializer& ObjectInitializer);
 
-	/** Generates a simple box mesh with the given extents. */
-	void GenerateBox(FVector InExtent);
+	/** Generates a simple plane mesh with the given extents. */
+	UFUNCTION(CallInEditor, Category = "Procedural Mesh")
+	void GeneratePlane();
 
 	/** Converts the current procedural mesh to a static mesh asset. */
-	UStaticMesh* ConvertToStaticMesh(FString AssetPath, FString AssetName);
+	UFUNCTION(CallInEditor, Category = "Procedural Mesh")
+	void ConvertToStaticMesh();
+
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Procedural Mesh")
+	FVector PlaneExtent = FVector(100.f, 100.f, 0.f);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Procedural Mesh")
+	FString StaticMeshAssetPath = TEXT("/Game/ProceduralMeshes");
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Procedural Mesh")
+	FString StaticMeshAssetName = TEXT("MyProceduralMesh");
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Procedural Mesh|Generation")
+	TArray<FIntPoint> DisabledTiles;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Procedural Mesh|Generation", meta = (ClampMin = "1"))
+	int32 GridResolution = 10;
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ProceduralMeshPlayground")

@@ -16,64 +16,81 @@ AProceduralMeshPlayground::AProceduralMeshPlayground(const FObjectInitializer& O
 {
 	ProceduralMesh = CreateDefaultSubobject<UProceduralMeshComponent>(TEXT("ProceduralMesh"));
     RootComponent = ProceduralMesh;
+
+    // Use the complex geometry of the mesh for collision.
+    // This is crucial for the NavMesh to recognize the holes.
+    ProceduralMesh->bUseComplexAsSimpleCollision = true;
 }
 
-void AProceduralMeshPlayground::GenerateBox(FVector InExtent)
+void AProceduralMeshPlayground::GeneratePlane()
 {
     if (!ProceduralMesh)
     {
         return;
     }
 
+    ProceduralMesh->ClearAllMeshSections();
+
     TArray<FVector> Vertices;
     TArray<int32> Triangles;
-    TArray<FVector> Normals;
-    TArray<FVector2D> UVs;
-    TArray<FProcMeshTangent> Tangents;
-    TArray<FLinearColor> VertexColors; // Unused, but required by CreateMeshSection_LinearColor
+    TArray<FVector> Normals; // Unreal will calculate these for us
+    TArray<FVector2D> UVs; // We'll generate these
+    TArray<FProcMeshTangent> Tangents; // Unreal will calculate these
+    TArray<FLinearColor> VertexColors; // Not used
 
-    // Define the 8 vertices of the box
-    FVector V0 = FVector(-InExtent.X, -InExtent.Y, -InExtent.Z);
-    FVector V1 = FVector(InExtent.X, -InExtent.Y, -InExtent.Z);
-    FVector V2 = FVector(InExtent.X, InExtent.Y, -InExtent.Z);
-    FVector V3 = FVector(-InExtent.X, InExtent.Y, -InExtent.Z);
-    FVector V4 = FVector(-InExtent.X, -InExtent.Y, InExtent.Z);
-    FVector V5 = FVector(InExtent.X, -InExtent.Y, InExtent.Z);
-    FVector V6 = FVector(InExtent.X, InExtent.Y, InExtent.Z);
-    FVector V7 = FVector(-InExtent.X, InExtent.Y, InExtent.Z);
+    const float CellSizeX = (PlaneExtent.X * 2.f) / GridResolution;
+    const float CellSizeY = (PlaneExtent.Y * 2.f) / GridResolution;
 
-    Vertices.Append({ V0, V1, V2, V3, V4, V5, V6, V7 });
+    for (int32 Y_Index = 0; Y_Index < GridResolution; ++Y_Index)
+    {
+        for (int32 X_Index = 0; X_Index < GridResolution; ++X_Index)
+        {
+            // Check if the current tile index is in the disabled list
+            if (DisabledTiles.Contains(FIntPoint(X_Index, Y_Index)))
+            {
+                continue; // Skip this tile
+            }
 
-    // Define the 12 triangles (2 for each of the 6 faces)
-    // Front face
-    Triangles.Append({0, 2, 1, 0, 3, 2});
-    // Back face
-    Triangles.Append({4, 5, 6, 4, 6, 7});
-    // Left face
-    Triangles.Append({0, 7, 3, 0, 4, 7});
-    // Right face
-    Triangles.Append({1, 2, 6, 1, 6, 5});
-    // Top face
-    Triangles.Append({3, 7, 6, 3, 6, 2});
-    // Bottom face
-    Triangles.Append({0, 1, 5, 0, 5, 4});
+            // If not disabled, generate the quad for this cell
+            const float StartX = -PlaneExtent.X + X_Index * CellSizeX;
+            const float StartY = -PlaneExtent.Y + Y_Index * CellSizeY;
+            const int32 BaseVertexIndex = Vertices.Num();
 
-    // Normals and UVs are generated automatically by BuildMeshDescription from the vertex positions and triangles.
-    // We can leave the normal/uv arrays empty here.
+            // Define the 4 vertices of the quad
+            FVector V0 = FVector(StartX, StartY, 0);
+            FVector V1 = FVector(StartX + CellSizeX, StartY, 0);
+            FVector V2 = FVector(StartX + CellSizeX, StartY + CellSizeY, 0);
+            FVector V3 = FVector(StartX, StartY + CellSizeY, 0);
+            Vertices.Append({ V0, V1, V2, V3 });
 
-    ProceduralMesh->ClearAllMeshSections();
-    ProceduralMesh->CreateMeshSection_LinearColor(0, Vertices, Triangles, TArray<FVector>(), TArray<FVector2D>(), VertexColors, Tangents, true);
+            // Define the 2 triangles for the quad
+            Triangles.Append({ BaseVertexIndex, BaseVertexIndex + 2, BaseVertexIndex + 1 });
+            Triangles.Append({ BaseVertexIndex, BaseVertexIndex + 3, BaseVertexIndex + 2 });
+
+            // Add UVs corresponding to the vertices
+            UVs.Add(FVector2D((StartX + PlaneExtent.X) / (PlaneExtent.X * 2.f), (StartY + PlaneExtent.Y) / (PlaneExtent.Y * 2.f)));
+            UVs.Add(FVector2D((StartX + CellSizeX + PlaneExtent.X) / (PlaneExtent.X * 2.f), (StartY + PlaneExtent.Y) / (PlaneExtent.Y * 2.f)));
+            UVs.Add(FVector2D((StartX + CellSizeX + PlaneExtent.X) / (PlaneExtent.X * 2.f), (StartY + CellSizeY + PlaneExtent.Y) / (PlaneExtent.Y * 2.f)));
+            UVs.Add(FVector2D((StartX + PlaneExtent.X) / (PlaneExtent.X * 2.f), (StartY + CellSizeY + PlaneExtent.Y) / (PlaneExtent.Y * 2.f)));
+        }
+    }
+
+    if (Vertices.Num() > 0)
+    {
+        ProceduralMesh->CreateMeshSection_LinearColor(0, Vertices, Triangles, TArray<FVector>(), UVs, VertexColors, Tangents, true);
+    }
 }
 
-UStaticMesh* AProceduralMeshPlayground::ConvertToStaticMesh(FString AssetPath, FString AssetName)
+void AProceduralMeshPlayground::ConvertToStaticMesh()
 {
-	if (!ProceduralMesh || ProceduralMesh->GetNumSections() == 0 || AssetName.IsEmpty() || AssetPath.IsEmpty())
+	if (!ProceduralMesh || ProceduralMesh->GetNumSections() == 0 || StaticMeshAssetName.IsEmpty() || StaticMeshAssetPath.IsEmpty())
 	{
-		return nullptr;
+		return;
 	}
 
-    FString PackageName = AssetPath + "/" + AssetName;
+    FString PackageName = StaticMeshAssetPath + "/" + StaticMeshAssetName;
 	UPackage* Package = CreatePackage(*PackageName);
+	FString AssetName = StaticMeshAssetName;
 	check(Package);
 
 	// Create StaticMesh object
@@ -124,7 +141,7 @@ UStaticMesh* AProceduralMeshPlayground::ConvertToStaticMesh(FString AssetPath, F
 	FAssetRegistryModule::AssetCreated(StaticMesh);
     Package->MarkPackageDirty();
 
-	return StaticMesh;
+	
 }
 
 
