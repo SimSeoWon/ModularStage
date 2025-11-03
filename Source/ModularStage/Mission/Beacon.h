@@ -33,6 +33,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Beacon")
 	FSoftObjectPath MeshToLoad;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Beacon")
+	FVector VolumeSize = FVector(1000.0f, 1000.0f, 100.0f);
+
 protected:
 	UFUNCTION()
 	void LoadAndSpawnMesh();

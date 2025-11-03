@@ -48,30 +48,69 @@ void AProceduralMeshPlayground::GeneratePlane()
             // Check if the current tile index is in the disabled list
             if (DisabledTiles.Contains(FIntPoint(X_Index, Y_Index)))
             {
-                continue; // Skip this tile
+                // For disabled tiles, generate a tall box to block navigation
+                const float StartX = -PlaneExtent.X + X_Index * CellSizeX;
+                const float StartY = -PlaneExtent.Y + Y_Index * CellSizeY;
+                const int32 BaseVertexIndex = Vertices.Num();
+
+                // 8 vertices of the cube
+                FVector V0 = FVector(StartX, StartY, 0);
+                FVector V1 = FVector(StartX + CellSizeX, StartY, 0);
+                FVector V2 = FVector(StartX + CellSizeX, StartY + CellSizeY, 0);
+                FVector V3 = FVector(StartX, StartY + CellSizeY, 0);
+                FVector V4 = FVector(StartX, StartY, WallHeight);
+                FVector V5 = FVector(StartX + CellSizeX, StartY, WallHeight);
+                FVector V6 = FVector(StartX + CellSizeX, StartY + CellSizeY, WallHeight);
+                FVector V7 = FVector(StartX, StartY + CellSizeY, WallHeight);
+                Vertices.Append({ V0, V1, V2, V3, V4, V5, V6, V7 });
+
+                // 12 triangles of the cube
+                // Bottom face
+                Triangles.Append({ BaseVertexIndex, BaseVertexIndex + 1, BaseVertexIndex + 2 });
+                Triangles.Append({ BaseVertexIndex, BaseVertexIndex + 2, BaseVertexIndex + 3 });
+                // Top face
+                Triangles.Append({ BaseVertexIndex + 4, BaseVertexIndex + 6, BaseVertexIndex + 5 });
+                Triangles.Append({ BaseVertexIndex + 4, BaseVertexIndex + 7, BaseVertexIndex + 6 });
+                // Front face
+                Triangles.Append({ BaseVertexIndex + 0, BaseVertexIndex + 4, BaseVertexIndex + 5 });
+                Triangles.Append({ BaseVertexIndex + 0, BaseVertexIndex + 5, BaseVertexIndex + 1 });
+                // Back face
+                Triangles.Append({ BaseVertexIndex + 3, BaseVertexIndex + 2, BaseVertexIndex + 6 });
+                Triangles.Append({ BaseVertexIndex + 3, BaseVertexIndex + 6, BaseVertexIndex + 7 });
+                // Left face
+                Triangles.Append({ BaseVertexIndex + 0, BaseVertexIndex + 3, BaseVertexIndex + 7 });
+                Triangles.Append({ BaseVertexIndex + 0, BaseVertexIndex + 7, BaseVertexIndex + 4 });
+                // Right face
+                Triangles.Append({ BaseVertexIndex + 1, BaseVertexIndex + 5, BaseVertexIndex + 6 });
+                Triangles.Append({ BaseVertexIndex + 1, BaseVertexIndex + 6, BaseVertexIndex + 2 });
+
+                // Add UVs for the 8 vertices
+                for (int i = 0; i < 8; ++i) { UVs.Add(FVector2D(0,0)); } // Dummy UVs
             }
+            else
+            {
+                // If not disabled, generate the quad for this cell
+                const float StartX = -PlaneExtent.X + X_Index * CellSizeX;
+                const float StartY = -PlaneExtent.Y + Y_Index * CellSizeY;
+                const int32 BaseVertexIndex = Vertices.Num();
 
-            // If not disabled, generate the quad for this cell
-            const float StartX = -PlaneExtent.X + X_Index * CellSizeX;
-            const float StartY = -PlaneExtent.Y + Y_Index * CellSizeY;
-            const int32 BaseVertexIndex = Vertices.Num();
+                // Define the 4 vertices of the quad
+                FVector V0 = FVector(StartX, StartY, 0);
+                FVector V1 = FVector(StartX + CellSizeX, StartY, 0);
+                FVector V2 = FVector(StartX + CellSizeX, StartY + CellSizeY, 0);
+                FVector V3 = FVector(StartX, StartY + CellSizeY, 0);
+                Vertices.Append({ V0, V1, V2, V3 });
 
-            // Define the 4 vertices of the quad
-            FVector V0 = FVector(StartX, StartY, 0);
-            FVector V1 = FVector(StartX + CellSizeX, StartY, 0);
-            FVector V2 = FVector(StartX + CellSizeX, StartY + CellSizeY, 0);
-            FVector V3 = FVector(StartX, StartY + CellSizeY, 0);
-            Vertices.Append({ V0, V1, V2, V3 });
+                // Define the 2 triangles for the quad
+                Triangles.Append({ BaseVertexIndex, BaseVertexIndex + 2, BaseVertexIndex + 1 });
+                Triangles.Append({ BaseVertexIndex, BaseVertexIndex + 3, BaseVertexIndex + 2 });
 
-            // Define the 2 triangles for the quad
-            Triangles.Append({ BaseVertexIndex, BaseVertexIndex + 2, BaseVertexIndex + 1 });
-            Triangles.Append({ BaseVertexIndex, BaseVertexIndex + 3, BaseVertexIndex + 2 });
-
-            // Add UVs corresponding to the vertices
-            UVs.Add(FVector2D((StartX + PlaneExtent.X) / (PlaneExtent.X * 2.f), (StartY + PlaneExtent.Y) / (PlaneExtent.Y * 2.f)));
-            UVs.Add(FVector2D((StartX + CellSizeX + PlaneExtent.X) / (PlaneExtent.X * 2.f), (StartY + PlaneExtent.Y) / (PlaneExtent.Y * 2.f)));
-            UVs.Add(FVector2D((StartX + CellSizeX + PlaneExtent.X) / (PlaneExtent.X * 2.f), (StartY + CellSizeY + PlaneExtent.Y) / (PlaneExtent.Y * 2.f)));
-            UVs.Add(FVector2D((StartX + PlaneExtent.X) / (PlaneExtent.X * 2.f), (StartY + CellSizeY + PlaneExtent.Y) / (PlaneExtent.Y * 2.f)));
+                // Add UVs corresponding to the vertices
+                UVs.Add(FVector2D((StartX + PlaneExtent.X) / (PlaneExtent.X * 2.f), (StartY + PlaneExtent.Y) / (PlaneExtent.Y * 2.f)));
+                UVs.Add(FVector2D((StartX + CellSizeX + PlaneExtent.X) / (PlaneExtent.X * 2.f), (StartY + PlaneExtent.Y) / (PlaneExtent.Y * 2.f)));
+                UVs.Add(FVector2D((StartX + CellSizeX + PlaneExtent.X) / (PlaneExtent.X * 2.f), (StartY + CellSizeY + PlaneExtent.Y) / (PlaneExtent.Y * 2.f)));
+                UVs.Add(FVector2D((StartX + PlaneExtent.X) / (PlaneExtent.X * 2.f), (StartY + CellSizeY + PlaneExtent.Y) / (PlaneExtent.Y * 2.f)));
+            }
         }
     }
 

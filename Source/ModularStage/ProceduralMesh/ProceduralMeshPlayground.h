@@ -41,6 +41,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Procedural Mesh|Generation", meta = (ClampMin = "1"))
 	int32 GridResolution = 10;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Procedural Mesh|Generation")
+	float WallHeight = 500.f;
+
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ProceduralMeshPlayground")
 	UProceduralMeshComponent* ProceduralMesh;

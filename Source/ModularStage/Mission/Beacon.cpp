@@ -1,10 +1,11 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #include "Beacon.h"
 #include "AI/Navigation/NavigationTypes.h"
 #include "Components/StaticMeshComponent.h"
 #include "Engine/StaticMesh.h"
 #include "TimerManager.h"
+#include "NavModifierVolume.h"
+#include "NavAreas/NavArea_Null.h"
+#include "Components/BrushComponent.h"
 
 // Sets default values
 ABeacon::ABeacon()
@@ -23,6 +24,22 @@ ABeacon::ABeacon()
 void ABeacon::BeginPlay()
 {
 	Super::BeginPlay();
+
+	// Spawn a NavModifierVolume to prevent navmesh generation in the area
+	ANavModifierVolume* NavModifierVolume = GetWorld()->SpawnActor<ANavModifierVolume>(GetActorLocation(), GetActorRotation());
+	if (NavModifierVolume)
+	{
+		NavModifierVolume->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
+		NavModifierVolume->SetActorScale3D(VolumeSize / 100.f); // Assuming the default brush is 100x100x100
+		NavModifierVolume->SetAreaClass(UNavArea_Null::StaticClass());
+
+		UNavigationSystemV1* NavSys = FNavigationSystem::GetCurrent<UNavigationSystemV1>(GetWorld());
+		if (NavSys)
+		{
+			FBox Bounds = NavModifierVolume->GetBrushComponent()->Bounds.GetBox();
+			NavSys->AddDirtyArea(Bounds, ENavigationDirtyFlag::All);
+		}
+	}
 
 	LoadAndSpawnMesh();
 }
@@ -55,6 +72,8 @@ void ABeacon::OnMeshLoaded()
 	if (StaticMeshComponent)
 	{
 		StaticMeshComponent->SetStaticMesh(LoadedMesh);
+		StaticMeshComponent->SetVisibility(false);
+		StaticMeshComponent->SetHiddenInGame(true);
 		// Ensure collision is enabled for NavMesh generation
 		StaticMeshComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 		StaticMeshComponent->SetCollisionResponseToAllChannels(ECR_Block);
