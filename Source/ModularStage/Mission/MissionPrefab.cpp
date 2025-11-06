@@ -10,7 +10,6 @@
 #include "Editor.h"
 #include "Editor/EditorEngine.h"
 #include "EditorUtilitySubsystem.h"
-#include "MeshGeneratorWidget.h"
 #endif
 
 #include "ScopedTransaction.h"
@@ -52,23 +51,7 @@ void AMissionPrefab::Tick(float DeltaTime)
 void AMissionPrefab::OpenMeshGenerator()
 {
 #if WITH_EDITOR
-    UEditorUtilitySubsystem* EditorUtilitySubsystem = GEditor->GetEditorSubsystem<UEditorUtilitySubsystem>();
-    if (!EditorUtilitySubsystem)
-    {
-        return;
-    }
-
-    const FString WidgetPath = UMeshGeneratorWidget::GetWidgetBlueprintPath();
-    UObject* WidgetBlueprint = LoadObject<UObject>(nullptr, *WidgetPath);
-
-    //if (WidgetBlueprint)
-    //{
-    //    UEditorUtilityWidget* SpawnedTab = EditorUtilitySubsystem->SpawnAndRegisterTab(WidgetBlueprint);
-    //    if (UMeshGeneratorWidget* SpawnedWidget = Cast<UMeshGeneratorWidget>(SpawnedTab))
-    //    {
-    //        SpawnedWidget->SetTargetPrefab(this);
-    //    }
-    //}
+   
 #endif
 }
 

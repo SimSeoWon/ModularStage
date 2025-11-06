@@ -18,6 +18,7 @@
 #include "MeshGeneratorWidget.h"
 
 
+
 #define LOCTEXT_NAMESPACE "ModularStageEditor"
 
 FName FModularStageEditor::TabName = FName("ModularStageEditorTab");
@@ -101,8 +102,8 @@ void FModularStageEditor::SetEditorMenu()
 
 		// Register the editor menus using the new template function
 		RegisterEditorMenu<UStagePresetEditor>(MenuHelper, TEXT("ModularStage"));
-		RegisterEditorMenu<UMeshGeneratorWidget>(MenuHelper, TEXT("MeshGenerator"));
 		RegisterEditorMenu<UEUW_InGameTask>(MenuHelper, TEXT("MissionTask"));
+		RegisterEditorMenu<UMeshGeneratorWidget>(MenuHelper, TEXT("MeshGenerator"));
 		
 	}
 }
