@@ -26,7 +26,12 @@ class SPreviewViewport : public SEditorViewport
 {
 public:
 
-	SLATE_BEGIN_ARGS(SPreviewViewport) { }
+	SLATE_BEGIN_ARGS(SPreviewViewport)
+		: _PreviewScene()
+		{}
+
+		SLATE_ARGUMENT(TSharedPtr<FPreviewScene>, PreviewScene)
+
 	SLATE_END_ARGS()
 
 	/** Virtual destructor. */

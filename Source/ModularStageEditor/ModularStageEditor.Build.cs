@@ -89,7 +89,8 @@ public class ModularStageEditor : ModuleRules
                 "Synthesis",
                 "DeveloperSettings",
                 "Persona",
-                "ContentBrowser", });
+                "ContentBrowser",
+                "AdvancedPreviewScene", });
 
         // Uncomment if you are using Slate UI
         // PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });

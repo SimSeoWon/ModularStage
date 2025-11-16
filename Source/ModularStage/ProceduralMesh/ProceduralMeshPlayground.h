@@ -25,7 +25,7 @@ public:
 	UFUNCTION(CallInEditor, Category = "Procedural Mesh")
 	void ConvertToStaticMesh();
 
-protected:
+public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Procedural Mesh")
 	FVector PlaneExtent = FVector(100.f, 100.f, 0.f);
 

@@ -9,6 +9,10 @@
 
 class SPreviewViewport;
 class AMissionPrefab;
+class FAdvancedPreviewScene;
+class AActor; // Forward declare AActor
+
+class USquareTileView;
 
 /**
  * An Editor Utility Widget for generating meshes and previewing them.
@@ -32,11 +36,39 @@ public:
 
 protected:
 	virtual TSharedRef<SWidget> RebuildWidget() override;
+	virtual void ReleaseSlateResources(bool bReleaseChildren) override;
+
+protected:
+	UPROPERTY(EditAnywhere)
+	int32 NumSquares = 1;
+	UPROPERTY(EditAnywhere)
+	float SquareSize = 100.0f;
+
+	/** Path to the MissionPrefab asset to load. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh Generation")
+	FString PrefabPath;
+
+	FReply OnGenerateMeshClicked();
+	FReply OnExportMeshClicked();
+	FReply OnLoadPrefabClicked();
+	FReply OnBrowsePrefabPathClicked();
 
 	/** The MissionPrefab actor that is being targeted. */
 	UPROPERTY(BlueprintReadOnly, Category = "Mesh Generation")
 	TWeakObjectPtr<AMissionPrefab> TargetPrefab;
 
+	/** The actor being previewed in the scene. */
+	UPROPERTY()
+	TWeakObjectPtr<AActor> PreviewActor;
+
 	/** The viewport widget */
 	TSharedPtr<SPreviewViewport> PreviewViewportWidget;
+
+	TSharedPtr<FAdvancedPreviewScene> PreviewScene;
+
+	UPROPERTY(EditAnywhere, Category = "Mesh Generation")
+	TSubclassOf<USquareTileView> SquareTileViewClass;
+
+	UPROPERTY()
+	USquareTileView* SquareTileView;
 };

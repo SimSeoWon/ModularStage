@@ -27,6 +27,12 @@ public class ModularStage : ModuleRules
             "MeshDescription",
             "StaticMeshDescription",
         });
+        PrivateDependencyModuleNames.AddRange(new string[]
+        {
+            "Slate",
+            "SlateCore",
+            "UMG" // UButton 경고도 있으므로 UMG도 필요합니다.
+        });
 
         AddIncludePath(ref PrivateIncludePaths, "ModularStage");
 
@@ -39,6 +45,8 @@ public class ModularStage : ModuleRules
             "ModularStageEditor",
             "UMGEditor",
             "Blutility",
+            "AssetTools",
+            "ContentBrowser",
             });
 
             PrivateDependencyModuleNames.AddRange(new string[] { "UnrealEd", "Kismet" });

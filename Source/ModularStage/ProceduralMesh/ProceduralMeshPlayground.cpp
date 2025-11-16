@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "ProceduralMeshPlayground.h"
+#include "IContentBrowserSingleton.h"
 #include "PhysicsEngine/BodySetup.h"
 #include "StaticMeshAttributes.h"
 #include "AssetRegistry/AssetRegistryModule.h"
@@ -10,6 +11,8 @@
 #include "Engine/StaticMeshSourceData.h"
 #include "Engine/StaticMesh.h"
 #include "UObject/Package.h"
+#include "ContentBrowserModule.h"
+#include "AssetToolsModule.h"
 
 // Sets default values
 AProceduralMeshPlayground::AProceduralMeshPlayground(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
@@ -127,13 +130,16 @@ void AProceduralMeshPlayground::ConvertToStaticMesh()
 		return;
 	}
 
-    FString PackageName = StaticMeshAssetPath + "/" + StaticMeshAssetName;
-	UPackage* Package = CreatePackage(*PackageName);
-	FString AssetName = StaticMeshAssetName;
+	FAssetToolsModule& AssetToolsModule = FModuleManager::LoadModuleChecked<FAssetToolsModule>("AssetTools");
+	FString UniquePackageName;
+	FString UniqueAssetName;
+	AssetToolsModule.Get().CreateUniqueAssetName(StaticMeshAssetPath + TEXT("/") + StaticMeshAssetName, TEXT(""), UniquePackageName, UniqueAssetName);
+
+	UPackage* Package = CreatePackage(*UniquePackageName);
 	check(Package);
 
 	// Create StaticMesh object
-	UStaticMesh* StaticMesh = NewObject<UStaticMesh>(Package, *AssetName, RF_Public | RF_Standalone);
+	UStaticMesh* StaticMesh = NewObject<UStaticMesh>(Package, *UniqueAssetName, RF_Public | RF_Standalone);
 	StaticMesh->InitResources();
 	StaticMesh->SetLightingGuid();
 
@@ -179,6 +185,10 @@ void AProceduralMeshPlayground::ConvertToStaticMesh()
 	// Notify asset registry of new asset
 	FAssetRegistryModule::AssetCreated(StaticMesh);
     Package->MarkPackageDirty();
+
+	// Sync content browser to the new asset
+	FContentBrowserModule& ContentBrowserModule = FModuleManager::LoadModuleChecked<FContentBrowserModule>("ContentBrowser");
+	ContentBrowserModule.Get().SyncBrowserToAssets(TArray<UObject*>{StaticMesh});
 
 	
 }
@@ -233,6 +243,7 @@ FMeshDescription AProceduralMeshPlayground::BuildMeshDescription(UProceduralMesh
 		PolygonGroupForSection.Add(*PolygonGroupID);
 	}
 
+	int32 VertexInstanceOffset = 0;
 	for (int32 SectionIdx = 0; SectionIdx < NumSections; SectionIdx++)
 	{
 		FProcMeshSection* ProcSection = ProcMeshComp->GetProcMeshSection(SectionIdx);
@@ -272,10 +283,12 @@ FMeshDescription AProceduralMeshPlayground::BuildMeshDescription(UProceduralMesh
 			for (int32 CornerIndex = 0; CornerIndex < 3; ++CornerIndex)
 			{
 				const int32 IndiceIndex = (TriIdx * 3) + CornerIndex;
-                VertexInstanceIDs[CornerIndex] = FVertexInstanceID(IndiceIndex);
+                VertexInstanceIDs[CornerIndex] = FVertexInstanceID(VertexInstanceOffset + IndiceIndex);
 			}
 			MeshDescription.CreatePolygon(PolygonGroupID, VertexInstanceIDs);
 		}
+
+		VertexInstanceOffset += ProcSection->ProcIndexBuffer.Num();
 	}
 	return MeshDescription;
 }

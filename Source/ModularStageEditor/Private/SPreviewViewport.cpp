@@ -45,19 +45,23 @@ SPreviewViewport::~SPreviewViewport()
 
 void SPreviewViewport::Construct(const FArguments& InArgs)
 {
-	// Create a preview scene.
-	PreviewScene = MakeShareable(new FPreviewScene(FPreviewScene::ConstructionValues()));
-
-	// Create a static mesh component to display in the scene.
-	PreviewMeshComponent = NewObject<UStaticMeshComponent>();
-	
-	UStaticMesh* CubeMesh = LoadObject<UStaticMesh>(nullptr, TEXT("/Engine/BasicShapes/Cube"));
-	if (CubeMesh)
+	PreviewScene = InArgs._PreviewScene;
+	if (!PreviewScene.IsValid())
 	{
-		PreviewMeshComponent->SetStaticMesh(CubeMesh);
-	}
+		// Create a preview scene.
+		PreviewScene = MakeShareable(new FPreviewScene(FPreviewScene::ConstructionValues()));
 
-	PreviewScene->AddComponent(PreviewMeshComponent, FTransform::Identity);
+		// Create a static mesh component to display in the scene.
+		PreviewMeshComponent = NewObject<UStaticMeshComponent>();
+		
+		UStaticMesh* CubeMesh = LoadObject<UStaticMesh>(nullptr, TEXT("/Engine/BasicShapes/Cube"));
+		if (CubeMesh)
+		{
+			PreviewMeshComponent->SetStaticMesh(CubeMesh);
+		}
+
+		PreviewScene->AddComponent(PreviewMeshComponent, FTransform::Identity);
+	}
 
 	// Construct the base SEditorViewport, which will call MakeEditorViewportClient().
 	SEditorViewport::Construct(SEditorViewport::FArguments());
