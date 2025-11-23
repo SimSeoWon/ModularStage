@@ -68,8 +68,6 @@ void USquareTileView::SetTileListItems(float inTileSize, int32 inColumn, int32 i
 
 	float correctedSize = TileSize * Scale;
 
-	TileHeight = correctedSize;
-	TileWidth = correctedSize;
 	TileHalfHeight = correctedSize / 2;
 	TileHalfWidth = correctedSize / 2;
 
@@ -84,7 +82,7 @@ void USquareTileView::SetTileListItems(float inTileSize, int32 inColumn, int32 i
 		info->Index = i;
 
 		FVector2D coordinates(i % Column, i / Column);
-		info->Init(coordinates, correctedSize, TileWidth, TileHeight, Scale);
+		info->Init(coordinates, correctedSize, Scale);
 
 		arrSquareTile.Add(info);
 	}
@@ -99,8 +97,6 @@ void USquareTileView::SetTileListItems(const TArray<USquareTileDataBase*>& inLis
 
 	float correctedSize = TileSize * Scale;
 
-	TileHeight = correctedSize;
-	TileWidth = correctedSize;
 	TileHalfHeight = correctedSize / 2;
 	TileHalfWidth = correctedSize / 2;
 	int32 tileCount = TileDataList.Num();
@@ -114,7 +110,7 @@ void USquareTileView::SetTileListItems(const TArray<USquareTileDataBase*>& inLis
 			continue;
 
 		FVector2D coordinates(i % Column, i / Column);
-		tileData->Init(coordinates, correctedSize, TileWidth, TileHeight, Scale);
+		tileData->Init(coordinates, correctedSize, Scale);
 
 		USquareTileItem* tileWidget = CreateWidget<USquareTileItem>(GetWorld(), SquareTileAsset.LoadSynchronous());
 		if (IsValid(tileWidget))
@@ -132,14 +128,14 @@ void USquareTileView::SetTileListItems(const TArray<USquareTileDataBase*>& inLis
 
 	if (Column >= tileCount)
 	{
-		TotalWidth = tileCount * TileWidth;
-		TotalHeight = TileHeight;
+		TotalWidth = tileCount * TileSize;
+		TotalHeight = TileSize;
 	}
 	else
 	{
 		int32 rowCount = FMath::CeilToInt((float)tileCount / (float)Column);
-		TotalWidth = Column * TileWidth;
-		TotalHeight = rowCount * TileHeight;
+		TotalWidth = Column * TileSize;
+		TotalHeight = rowCount * TileSize;
 	}
 
 	UCanvasPanelSlot* canvasSlot = Cast<UCanvasPanelSlot>(RootPanel->Slot);
@@ -154,8 +150,6 @@ void USquareTileView::SetScale(float inScale)
 
 	float correctedSize = TileSize * Scale;
 
-	TileHeight = correctedSize;
-	TileWidth = correctedSize;
 	TileHalfHeight = correctedSize / 2;
 	TileHalfWidth = correctedSize / 2;
 	int32 tileCount = TileDataList.Num();
@@ -169,7 +163,7 @@ void USquareTileView::SetScale(float inScale)
 			continue;
 
 		FVector2D coordinates(i % Column, i / Column);
-		tileData->Init(coordinates, correctedSize, TileWidth, TileHeight, Scale);
+		tileData->Init(coordinates, correctedSize, Scale);
 
 		TWeakObjectPtr< USquareTileItem> tileWidget = SquareTileList[i];
 		if (false == tileWidget.IsValid())
@@ -185,14 +179,14 @@ void USquareTileView::SetScale(float inScale)
 
 	if (Column >= tileCount)
 	{
-		TotalWidth = tileCount * TileWidth;
-		TotalHeight = TileHeight;
+		TotalWidth = tileCount * TileSize;
+		TotalHeight = TileSize;
 	}
 	else
 	{
 		int32 rowCount = FMath::CeilToInt((float)tileCount / (float)Column);
-		TotalWidth = Column * TileWidth;
-		TotalHeight = rowCount * TileHeight;
+		TotalWidth = Column * TileSize;
+		TotalHeight = rowCount * TileSize;
 	}
 
 	UCanvasPanelSlot* canvasSlot = Cast<UCanvasPanelSlot>(RootPanel->Slot);
@@ -223,11 +217,11 @@ void USquareTileView::ClearSquareTileList()
 
 void USquareTileView::OnTouchMove()
 {
-	if (false == IsValid(TouchButton))
+	/*if (false == IsValid(TouchButton))
 		return;
 
 	FVector2D movePosition = TouchButton->GetTouchMovePosition();
-	OnTouchStart(movePosition);
+	OnTouchStart(movePosition);*/
 }
 
 void USquareTileView::OnClicked()
@@ -239,66 +233,35 @@ void USquareTileView::OnClicked()
 	OnTouchStart(startPosition);
 }
 
-void USquareTileView::SetSelectTile(int32 inIndex)
+void USquareTileView::OnTileClicked(int32 inIndex)
 {
-	if (false == TileDataList.IsValidIndex(inIndex))
-		return;
-
-	if (IsValid(SelectTileData))
+	if (TileDataList.IsValidIndex(inIndex))
 	{
-		SelectTileData->SetIsSelect(false);
-		SelectTileData->Refresh();
+		USquareTileDataBase* TileData = TileDataList[inIndex];
+		if (IsValid(TileData))
+		{
+			TileData->SetMovable(!TileData->IsMovable());
+			TileData->Refresh();
+
+			OnTileToggled.ExecuteIfBound(TileData);
+		}
 	}
-
-	SelectTileData = TileDataList[inIndex];
-
-	/*if (OnSelectSquareTile.IsBound())
-	{
-		OnSelectSquareTile.Execute(TileDataList[inIndex]->GetTopPostion());
-	}*/
-
-	if (false == IsValid(SelectTileData))
-		return;
-
-	SelectTileData->SetIsSelect(true);
-	SelectTileData->Refresh();
 }
 
 void USquareTileView::OnTouchStart(const FVector2D inPostion)
 {
 	//UE_LOG(LogTemp, Warning, TEXT("USquareTileView::OnTouchStart() - inPostion(%f, %f)"), inPostion.X, inPostion.Y);
-	int32 selectRow = FMath::FloorToInt(inPostion.Y / TileHeight);
-	int32 selectColumn = FMath::FloorToInt(inPostion.X / TileWidth);
+	int32 selectRow = FMath::FloorToInt(inPostion.Y / (TileSize * Scale));
+	int32 selectColumn = FMath::FloorToInt(inPostion.X / (TileSize * Scale));
 	int32 selectIndex = 0;
-
-
-
 
 	selectIndex = selectRow * Column + selectColumn;
 
-	if (false == TileDataList.IsValidIndex(selectIndex))
-		return;
-
-	if (TileDataList[selectIndex]->CollisionCheck(inPostion))
+	if (TileDataList.IsValidIndex(selectIndex))
 	{
-		if (IsValid(SelectTileData))
+		if (TileDataList[selectIndex]->CollisionCheck(inPostion))
 		{
-			SelectTileData->SetIsSelect(false);
-			SelectTileData->Refresh();
+			OnTileClicked(selectIndex);
 		}
-
-		SelectTileData = TileDataList[selectIndex];
-
-		/*if (OnSelectSquareTile.IsBound())
-		{
-			OnSelectSquareTile.Execute(TileDataList[selectIndex]->GetTopPostion());
-		}*/
 	}
-
-
-	if (false == IsValid(SelectTileData))
-		return;
-
-	SelectTileData->SetIsSelect(true);
-	SelectTileData->Refresh();
 }

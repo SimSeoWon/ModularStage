@@ -19,15 +19,11 @@ class MODULARSTAGE_API USquareTileItem : public UUserWidget, public IUserObjectL
 	GENERATED_BODY()
 public:
 	virtual void NativeOnListItemObjectSet(UObject* InObject) override;
-	virtual void SetSelect(bool isSelect);
 	virtual void Refresh();
 
 public:
 	UPROPERTY(meta = (BindWidget))
 	UImage* Img_Square = nullptr;
-
-	UPROPERTY(meta = (BindWidget))
-	UImage* Img_Select = nullptr;
 
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* Txt_Index = nullptr;

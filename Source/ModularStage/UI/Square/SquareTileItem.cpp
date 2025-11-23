@@ -36,15 +36,6 @@ void USquareTileItem::Refresh()
 		slot->SetSize(FVector2D(size, size));
 	}
 
-	slot = Cast<UCanvasPanelSlot>(Img_Select->Slot);
-	if (IsValid(slot))
-	{
-		slot->SetSize(FVector2D(size, size));
-	}
-
-	bool isSelect = TileData->GetIsSelect();
-	SetSelect(isSelect);
-
 	// Set color based on movability
 	if (TileData->IsMovable())
 	{
@@ -54,9 +45,4 @@ void USquareTileItem::Refresh()
 	{
 		Img_Square->SetColorAndOpacity(FLinearColor::Red); // Immovable tiles are red
 	}
-}
-
-void USquareTileItem::SetSelect(bool isSelect)
-{
-	Img_Select->SetVisibility(isSelect ? ESlateVisibility::SelfHitTestInvisible : ESlateVisibility::Collapsed);
 }

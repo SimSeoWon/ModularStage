@@ -15,6 +15,7 @@
 #include "Widgets/Text/STextBlock.h"
 #include "ProceduralMesh/ProceduralMeshPlayground.h"
 #include "UI/Square/SquareTileView.h"
+#include "UI/Square/SquareTileDataBase.h"
 
 #include "MissionPrefab.h"
 
@@ -107,6 +108,24 @@ TSharedRef<SWidget> UMeshGeneratorWidget::RebuildWidget()
 					.OnValueChanged_Lambda([this](float NewValue) { SquareSize = NewValue; })
 				]
 
+				// UI Scale Factor Label
+				+ SVerticalBox::Slot()
+				.AutoHeight()
+				.Padding(5)
+				[
+					SNew(STextBlock).Text(FText::FromString(TEXT("UI Scale Factor")))
+				]
+
+				// UI Scale Factor Input
+				+ SVerticalBox::Slot()
+				.AutoHeight()
+				.Padding(5)
+				[
+					SNew(SNumericEntryBox<float>)
+					.Value_Lambda([this] { return UIScaleFactor; })
+					.OnValueChanged_Lambda([this](float NewValue) { UIScaleFactor = NewValue; })
+				]
+
 				// Prefab Path Label
 				+ SVerticalBox::Slot()
 				.AutoHeight()
@@ -189,7 +208,8 @@ TSharedRef<SWidget> UMeshGeneratorWidget::RebuildWidget()
     // Initialize the SquareTileView after it has been created
     if (SquareTileView)
     {
-        SquareTileView->SetTileListItems(SquareSize, 10, NumSquares * NumSquares, 1.0f);
+        SquareTileView->SetTileListItems(SquareSize, NumSquares, NumSquares * NumSquares, UIScaleFactor);
+        SquareTileView->OnTileToggled.BindUObject(this, &UMeshGeneratorWidget::OnTileToggled);
     }
 
     return SNew(SScrollBox)
@@ -222,10 +242,35 @@ FReply UMeshGeneratorWidget::OnGenerateMeshClicked()
             MeshActor->GridResolution = NumSquares;
             MeshActor->PlaneExtent = FVector(SquareSize, SquareSize, 0.f);
             MeshActor->GeneratePlane();
+
+            if (SquareTileView)
+            {
+                SquareTileView->SetTileListItems(SquareSize, NumSquares, NumSquares * NumSquares, UIScaleFactor);
+            }
         }
     }
 
     return FReply::Handled();
+}
+
+void UMeshGeneratorWidget::OnTileToggled(USquareTileDataBase* TileData)
+{
+    if (PreviewActor.IsValid() && IsValid(TileData))
+    {
+        if (AProceduralMeshPlayground* MeshActor = Cast<AProceduralMeshPlayground>(PreviewActor.Get()))
+        {
+            FIntPoint Coords = FIntPoint(TileData->Coordinates.X, TileData->Coordinates.Y);
+            if (TileData->IsMovable())
+            {
+                MeshActor->DisabledTiles.Remove(Coords);
+            }
+            else
+            {
+                MeshActor->DisabledTiles.AddUnique(Coords);
+            }
+            MeshActor->GeneratePlane();
+        }
+    }
 }
 
 FReply UMeshGeneratorWidget::OnExportMeshClicked()

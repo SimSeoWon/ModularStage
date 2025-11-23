@@ -40,7 +40,7 @@ public:
 
 	UFUNCTION()
 	void OnTouchStart(const FVector2D inPostion);
-	void SetSelectTile(int32 inIndex);
+	void OnTileClicked(int32 inIndex);
 
 	UFUNCTION()
 	void OnClicked();
@@ -69,8 +69,6 @@ public:
 	float TileSize = 0.0f;
 	float Scale = 1.0f;
 
-	float TileHeight = 0.0f;
-	float TileWidth = 0.0f;
 	float TileHalfHeight = 0.0f;
 	float TileHalfWidth = 0.0f;
 	float TotalWidth = 0.0f;
@@ -89,6 +87,9 @@ public:
 	TArray<TWeakObjectPtr<USquareTileItem>> SquareTileList;
 	DECLARE_DELEGATE_OneParam(FSelectSquareTileDelegate, const FVector2D)
 	FSelectSquareTileDelegate OnSelectSquareTile;
+
+	DECLARE_DELEGATE_OneParam(FOnTileToggled, USquareTileDataBase*);
+	FOnTileToggled OnTileToggled;
 
 #if WITH_EDITORONLY_DATA
 private:

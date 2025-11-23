@@ -12,6 +12,7 @@ class AMissionPrefab;
 class FAdvancedPreviewScene;
 class AActor; // Forward declare AActor
 
+class USquareTileDataBase;
 class USquareTileView;
 
 /**
@@ -43,6 +44,8 @@ protected:
 	int32 NumSquares = 1;
 	UPROPERTY(EditAnywhere)
 	float SquareSize = 100.0f;
+	UPROPERTY(EditAnywhere)
+	float UIScaleFactor = 0.1f;
 
 	/** Path to the MissionPrefab asset to load. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh Generation")
@@ -52,6 +55,7 @@ protected:
 	FReply OnExportMeshClicked();
 	FReply OnLoadPrefabClicked();
 	FReply OnBrowsePrefabPathClicked();
+	void OnTileToggled(USquareTileDataBase* TileData);
 
 	/** The MissionPrefab actor that is being targeted. */
 	UPROPERTY(BlueprintReadOnly, Category = "Mesh Generation")

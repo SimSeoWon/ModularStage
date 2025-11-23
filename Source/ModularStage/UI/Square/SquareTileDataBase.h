@@ -15,7 +15,7 @@ class MODULARSTAGE_API USquareTileDataBase : public UObject
 {
 	GENERATED_BODY()
 public:
-	void Init(FVector2D inCoordinates, float inSize, float inWidth, float inHeight, float inScale);
+	void Init(FVector2D inCoordinates, float inSize, float inScale);
 
 	bool CollisionCheck(const FVector2D inPos); //  ٸü 浹 ˻.
 
@@ -39,8 +39,6 @@ public:
 	FVector2D Center;  //  ġ
 	float Size = 0.0f; // 
 	float Scale = 100.0f; // ô
-	float Height = 0.0f; // 
-	float Width = 0.0f; // 
 	int32 SubLevelID = 0;
 	TArray<FVector2D> CornerList; //  4
 
