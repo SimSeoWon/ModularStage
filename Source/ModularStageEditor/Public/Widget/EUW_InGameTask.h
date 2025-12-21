@@ -20,7 +20,7 @@ public:
 	static FText GetMenuDisplayName() { return FText::FromString(TEXT("Mission Task Editor")); }
 	static FText GetMenuTooltip() { return FText::FromString(TEXT("Mission Task Editor")); }
 	
-	static FString GetWidgetBlueprintPath() { return TEXT("/Game/nevercook/editor/BP_EUW_InGameTask.BP_EUW_InGameTask"); }
+	static FString GetWidgetBlueprintPath() { return TEXT("/Game/nevercook/editor/menu/BP_EUW_InGameTask.BP_EUW_InGameTask"); }
 
 	void Run();
 

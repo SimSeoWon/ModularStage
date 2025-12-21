@@ -4,6 +4,7 @@
 #include "EditorWidgetBase.h"
 #include "EditorWidget_AssetSelector.generated.h"
 
+class UEditorUtilityButton;
 class UContentBrowserWrapper;
 class UEditorUtilityEditableTextBox;
 struct FAssetData;
@@ -17,22 +18,31 @@ UCLASS()
 class MODULARSTAGEEDITOR_API UEditorWidget_AssetSelector : public UEditorWidgetBase
 {
 	GENERATED_BODY()
-	
+
 public:
 	// Default implementation for the widget blueprint path. Child classes should hide this.
 	static FString GetWidgetBlueprintPath()
 	{
-		return TEXT("/Game/nevercook/editor/BP_EditorWidget_AssetSelector.BP_EditorWidget_AssetSelector");
+		return TEXT("/Game/nevercook/editor/menu/BP_EditorWidget_AssetSelector.BP_EditorWidget_AssetSelector");
 	}
+
+	DECLARE_DELEGATE_OneParam(OnAcceptAssetPathDelegate, FString)
+	OnAcceptAssetPathDelegate& GetOnAcceptAssetPath() { return OnAcceptAssetPath; }
 
 protected:
 	virtual void NativeConstruct() override;
 	virtual void NativeDestruct() override;
 
 	UFUNCTION()
+	void OnClicked_Accept();
+
+	UFUNCTION()
 	void OnAssetSelected(const FAssetData& inAssetData);
 
 protected:
+	UPROPERTY(meta = (BindWidget))
+	UEditorUtilityButton* Btn_Accept = nullptr;
+
 	UPROPERTY(BlueprintReadOnly, Category = "Content Browser", meta = (BindWidget))
 	TObjectPtr<UEditorUtilityEditableTextBox> Edit_Path;
 
@@ -41,4 +51,7 @@ protected:
 
 	UFUNCTION(BlueprintCallable, Category = "Content Browser")
 	FString GetSelectedAssetPath();
+
+
+	OnAcceptAssetPathDelegate OnAcceptAssetPath;
 };

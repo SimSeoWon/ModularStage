@@ -21,7 +21,7 @@ class UUIListItem_InGameTask : public UUIWidgetBase, public IUserObjectListEntry
 {
 	GENERATED_BODY()
 protected:
-	/** 생성/ 소멸/ 틱*/
+	
 	virtual void NativeConstruct() override;
 	virtual void NativeDestruct() override;
 	virtual void NativeOnListItemObjectSet(UObject* ListItemObject) override;
@@ -86,11 +86,11 @@ public:
 	FOnClickedDelegate OnClicked_Delete = nullptr;
 	FOnClickedDelegate OnClicked_Edit = nullptr;
 	
-	int32 Step = 0; // 스탭
-	FString Title; // 타이틀
-	FString Desc; // 설명
-	int32 Index = -1;		// 작동할 타일의 인덱스
-	FVector2D Coordinates; //  작동할 타일의 2축 좌표
+	int32 Step = 0; 
+	FString Title;
+	FString Desc;
+	int32 Index = -1;
+	FVector2D Coordinates;
 	EInGameTaskType Type;
 	TArray<int32> IntegerParamList;
 	TArray<UEntryData_InGameTaskList*>  SubTaskList;

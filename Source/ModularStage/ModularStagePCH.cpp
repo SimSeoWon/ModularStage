@@ -1,8 +1,6 @@
 #include "ModularStagePCH.h"
 
 //////////////////////////////////////////////////////////////////////////
-// 로그 카테고리
-// 기본 로그 카테고리
 // DEFINE_LOG_CATEGORY(MONSTERLOG)
 // 
 // DEFINE_LOG_CATEGORY(MON_CDT_FNC_PRG)

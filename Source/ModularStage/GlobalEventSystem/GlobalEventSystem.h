@@ -181,7 +181,7 @@ private:
 
 /*
 
-//# GlobalEventInterfaces.h�� �̺�Ʈ �������̽� �߰�
+//# GlobalEventInterfaces.h
 //------------------------------------------------------------------------
 UINTERFACE()
 class UEventExample : public UGlobalEventListener
@@ -198,37 +198,33 @@ class IEventExample : public IGlobalEventListener
 };
 //------------------------------------------------------------------------
 
-
-//# �̺�Ʈ������ ���
 //------------------------------------------------------------------------
 void ...()
 {
-	// implements�� ��� �̺�Ʈ �ڵ����� �߰�
+	// implements
 	// FGlobalEventSystem::AddEventListenerAll(this);
 
 	OR
 
-	// Ư�� �̺�Ʈ�� �߰�
 	// FGlobalEventSystem::AddEventListener<IEventExample>(this);
 }
 //------------------------------------------------------------------------
 
-//# �̺�Ʈ������ ����
 //------------------------------------------------------------------------
 void ...()
 {
 
-	// implements�� ��� �̺�Ʈ ����
+	// implements
 	// FGlobalEventSystem::RemoveEventListenerAll(this);
 
 	OR
 
-	// Ư�� �̺�Ʈ�� ����
+	
 	// FGlobalEventSystem::RemoveEventListener<IEventExample>(this);
 }
 //------------------------------------------------------------------------
 
-//# �۷ι� �̺�Ʈ ����
+
 //------------------------------------------------------------------------
 ...
 int32 exampleVal = 1;

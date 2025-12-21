@@ -1,14 +1,19 @@
 #include "EditorWidget_AssetSelector.h"
+#include "EditorUtilityWidgetComponents.h"
+
 #include "ContentBrowserModule.h"
 #include "IContentBrowserSingleton.h"
 #include "AssetRegistry/AssetData.h"
 #include "Components/ContentBrowserWrapper.h"
-#include "EditorUtilityWidgetComponents.h"
-
 
 void UEditorWidget_AssetSelector::NativeConstruct()
 {
 	Super::NativeConstruct();
+
+	if (IsValid(Btn_Accept)) 
+	{
+		Btn_Accept->OnClicked.AddDynamic(this, &UEditorWidget_AssetSelector::OnClicked_Accept);
+	}
 
 	if (IsValid(ContentBrowser))
 	{
@@ -44,4 +49,15 @@ FString UEditorWidget_AssetSelector::GetSelectedAssetPath()
 	}
 
 	return FString();
+}
+
+void UEditorWidget_AssetSelector::OnClicked_Accept()
+{
+	UE_LOG(LogTemp, Log, TEXT("Confirm button clicked."));
+	FText path = Edit_Path->GetText();
+
+	if (OnAcceptAssetPath.IsBound())
+	{
+		OnAcceptAssetPath.Execute(path.ToString());
+	}
 }

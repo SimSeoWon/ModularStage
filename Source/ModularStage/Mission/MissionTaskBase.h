@@ -23,10 +23,6 @@ struct FMissionTaskInfo;
 		}\
 	}
 
-
-
-
-/**미션 진행을 관리하는 태스크 원형*/
 class FMissionTaskBase
 {
 public:
@@ -69,10 +65,10 @@ protected:
 	TSharedPtr<FMissionTaskBase> OccupiedTask;
 
 	TSharedPtr<FMissionTaskInfo> TaskInfo;
-	int32 Step = 0; //진행도
-	EInGameTaskType TaskType = EInGameTaskType::NONE; // 태스크 타입.
-	FString Title = TEXT(""); // 타이틀
-	FString Desc = TEXT(""); // 설명
+	int32 Step = 0;
+	EInGameTaskType TaskType = EInGameTaskType::NONE;
+	FString Title = TEXT("");
+	FString Desc = TEXT("");
 };
 
 class FMissionTask_Spawn : public FMissionTaskBase
@@ -86,12 +82,12 @@ public:
 	virtual ETaskExecutorResult DoAction() override;
 
 public:
-	uint64 ActorSN = 0; // 시리얼 넘버..
-	int32 ActorID = 0; // 액터 아이디
-	int32 TableID = 0; // 테이블 아이디.
-	// 테이블 종류 -> 몬스터, 배경 기물, 플레이어 등..
+	uint64 ActorSN = 0;
+	int32 ActorID = 0;
+	int32 TableID = 0;
+	
 	EInGameSpawnType SpawnType;
-	int32 TileIndex = -1;		// 작동할 타일의 인덱스
+	int32 TileIndex = -1;
 };
 
 class FMissionTask_MarchOn : public FMissionTaskBase
@@ -105,8 +101,8 @@ public:
 	virtual ETaskExecutorResult DoAction() override;
 
 public:
-	int32 ActorID = 0; // 액터 아이디
-	int32 TileIndex = -1;		// 목적지의 타일 인덱스
+	int32 ActorID = 0;
+	int32 TileIndex = -1;
 };
 
 class FMissionTask_SetCamera : public FMissionTaskBase
@@ -120,7 +116,7 @@ public:
 	virtual ETaskExecutorResult DoAction();
 
 public:
-	int32 TileIndex = -1;		// 작동할 타일의 인덱스
+	int32 TileIndex = -1;
 };
 
 
@@ -135,7 +131,7 @@ public:
 	virtual ETaskExecutorResult DoAction();
 
 public:
-	int32 TileIndex = -1;		// 작동할 타일의 인덱스
+	int32 TileIndex = -1;
 	int32 DialogID = 0;
 };
 

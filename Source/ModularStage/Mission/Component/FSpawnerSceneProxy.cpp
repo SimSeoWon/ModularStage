@@ -1,5 +1,5 @@
 #include "FSpawnerSceneProxy.h"
-#include "Engine/Engine.h" // GEngine »ç¿ë
+#include "Engine/Engine.h"
 #include "SceneManagement.h"
 #include "TextureResource.h"
 #include "MissionPropsComponent_Spawner.h"
@@ -13,30 +13,33 @@ SIZE_T FSpawnerSceneProxy::GetTypeHash() const
 FSpawnerSceneProxy::FSpawnerSceneProxy(const UMissionPropsComponent_Spawner* InComponent)
     : FPrimitiveSceneProxy(InComponent)
 {
-    UE_LOG(LogTemp, Warning, TEXT("FSpawnerSceneProxy constructor called!"));
+    //UE_LOG(LogTemp, Warning, TEXT("FSpawnerSceneProxy constructor called!"));
     SpawnPoints.Append(InComponent->SpawnPoints);
     PatrolPoints.Append(InComponent->PatrolPoints);
     IsShowDebug = InComponent->IsShowDebug;
-    SpriteIcon = InComponent->SpriteIcon;
+    
+    // [ìˆ˜ì •] UObjectì¸ SpriteIconì„ ì§ì ‘ ì €ì¥í•˜ì§€ ì•Šê³ , ë¦¬ì†ŒìŠ¤ë§Œ ì¶”ì¶œí•´ì„œ ìºì‹±
+    TextureResource = nullptr;
+    if (InComponent->SpriteIcon && InComponent->SpriteIcon->GetResource())
+    {
+        TextureResource = InComponent->SpriteIcon->GetResource();
+    }
+    else if (GEngine->DefaultTexture)
+    {
+        TextureResource = GEngine->DefaultTexture->GetResource();
+    }
 }
 
 void FSpawnerSceneProxy::GetDynamicMeshElements(const TArray<const FSceneView*>& Views, const FSceneViewFamily& ViewFamily, uint32 VisibilityMap, FMeshElementCollector& Collector) const
 {
     QUICK_SCOPE_CYCLE_COUNTER(STAT_SpawnerSceneProxy_GetDynamicMeshElements);
 
-    // ÇÁ·Ï½ÃÀÇ Local-to-World Æ®·£½ºÆû ¸ÅÆ®¸¯½º¸¦ °¡Á®¿É´Ï´Ù.
+    //Local-to-World
     const FMatrix& localToWorld = GetLocalToWorld();
 
-    FTexture* texture = nullptr;
-    if (SpriteIcon && SpriteIcon->GetResource())
-    {
-        texture = SpriteIcon->GetResource();
-    }
-    else if (GEngine->DefaultTexture && GEngine->DefaultTexture->GetResource())
-    {
-        // ¼³Á¤µÈ ¾ÆÀÌÄÜÀÌ ¾øÀ¸¸é ¿£Áø ±âº» ¾ÆÀÌÄÜ (S_Actor)À» »ç¿ëÇÕ´Ï´Ù.
-        texture = GEngine->DefaultTexture->GetResource();
-    }
+    // [ìˆ˜ì •] ë¯¸ë¦¬ ìºì‹±ëœ TextureResource ì‚¬ìš©
+    // UObject(SpriteIcon)ì— ì ‘ê·¼í•˜ì§€ ì•Šìœ¼ë¯€ë¡œ GC í¬ë˜ì‹œ í•´ê²°
+    FTexture* texture = TextureResource;
 
     for (int32 i = 0; i < Views.Num(); i++)
     {
@@ -45,22 +48,15 @@ void FSpawnerSceneProxy::GetDynamicMeshElements(const TArray<const FSceneView*>&
             const FSceneView* view = Views[i];
             FPrimitiveDrawInterface* pid = Collector.GetPDI(i);
 
-            // 2. ÅØ½ºÃ³ ¸®¼Ò½º°¡ À¯È¿ÇÏ¸é ±×¸³´Ï´Ù.
             if (texture)
             {
-                // ÄÄÆ÷³ÍÆ®ÀÇ ¿ùµå À§Ä¡¸¦ °¡Á®¿É´Ï´Ù.
                 FVector location = localToWorld.GetOrigin();
                 location.Z += 32.0f;
-
-                // ±âº» Å©±â¸¦ Á¤ÇÕ´Ï´Ù. (¿¹: 32x32)
                 const float size = 32.0f;
-
-                // ¼±ÅÃ »óÅÂ¿¡ µû¶ó »ö»óÀ» Á¤ÇÕ´Ï´Ù. (Èò»öÀÌ¾î¾ß ÅØ½ºÃ³ º»¿¬ÀÇ »öÀÌ ³ª¿È)
                 const FLinearColor color = GetViewSelectionColor(
                     FLinearColor::White, *view, IsSelected(), IsHovered(), false, IsIndividuallySelected()
                 );
 
-                // ½ºÇÁ¶óÀÌÆ®¸¦ ±×¸³´Ï´Ù.
                 pid->DrawSprite(location, size, size, texture,
                     color, SDPG_World, 0.0f, 0.0f,  0.0f, 0.0f);
             }
@@ -85,17 +81,12 @@ void FSpawnerSceneProxy::GetDynamicMeshElements(const TArray<const FSceneView*>&
 
 FPrimitiveViewRelevance FSpawnerSceneProxy::GetViewRelevance(const FSceneView* View) const
 {
-    // ¼±ÅÃµÇ¾úÀ» ¶§¸¸ ±×¸®°Å³ª, Ç×»ó º¸ÀÌµµ·Ï ¼³Á¤
     const bool bProxyVisible = IsSelected() || IsShowDebug;
-
-    // ºäÆ÷Æ®ÀÇ 'Show' ÇÃ·¡±×¿¡¼­ 'Sprites' ¶Ç´Â 'Collision'ÀÌ ÄÑÁ® ÀÖÀ» ¶§ º¸ÀÌµµ·Ï ÇÒ ¼ö ÀÖ½À´Ï´Ù.
-    // ¿©±â¼­´Â 'Collision' ÇÃ·¡±×¸¦ µû¸£µµ·Ï ¿¹½Ã¸¦ ¸¸µì´Ï´Ù.
     const bool bShowForCollision = View->Family->EngineShowFlags.Collision && IsCollisionEnabled();
 
     FPrimitiveViewRelevance Result;
-    // (º¸ÀÌµµ·Ï ¼³Á¤µÇ¾ú°í(IsShown) ¼±ÅÃµÇ¾ú°Å³ª(bProxyVisible)) ¶Ç´Â (Äİ¸®Àü Ç¥½Ã°¡ ÄÑÁ®ÀÖ´Ù¸é) ±×¸³´Ï´Ù.
     Result.bDrawRelevance = (IsShown(View) && bProxyVisible) || bShowForCollision;
-    Result.bDynamicRelevance = true; // GetDynamicMeshElements¸¦ »ç¿ëÇÏ¹Ç·Î true
+    Result.bDynamicRelevance = true; // GetDynamicMeshElements
     Result.bShadowRelevance = IsShadowCast(View);
     Result.bEditorPrimitiveRelevance = UseEditorCompositing(View);
     return Result;

@@ -20,25 +20,25 @@ public:
 
 public:
 	UPROPERTY(EditAnywhere)
-	int32 Step = 0; //진행도
+	int32 Step = 0;
 
 	UPROPERTY(EditAnywhere)
-	FString Title; // 타이틀
+	FString Title;
 
 	UPROPERTY(EditAnywhere)
-	FString Desc; // 설명
+	FString Desc;
 
 	UPROPERTY(EditAnywhere)
-	FGuid ParentID; // 부모 노드의 아이디
+	FGuid ParentID;
 
 	UPROPERTY(EditAnywhere)
-	FGuid SerializeID; // 구분자
+	FGuid SerializeID;
 
 	UPROPERTY(EditAnywhere)
-	TArray <int32> IntegerParamList; // int32 파라미터 목록.
+	TArray <int32> IntegerParamList;
 
 	UPROPERTY(EditAnywhere)
-	TArray <FString> StringParamList; // 스트링 파라미터 목록.
+	TArray <FString> StringParamList;
 };
 
 

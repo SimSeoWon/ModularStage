@@ -33,7 +33,7 @@ void FMissionMultiTaskBase::Clear()
 		if (false == iter.IsValid())
 			continue;
 
-		iter->Clear(); //정리한다.
+		iter->Clear();
 	}
 }
 
@@ -41,7 +41,6 @@ void FMissionMultiTaskBase::SetData(TSharedPtr<FMissionTaskInfo> inTaskInfo)
 {
 	FMissionTaskBase::SetData(inTaskInfo);
 	TaskInfo = inTaskInfo;
-	// 태스크 스탭, 타이틀, 설명, 조건등의 데이터...
 	//Step = TaskInfo->Step;
 	//TaskType = TaskInfo->TaskType;
 	//Title = TaskInfo->Title;
@@ -59,13 +58,11 @@ void FMissionMultiTaskBase::AddSubTask(TSharedRef<FMissionTaskBase> inSubTask)
 
 ETaskExecutorResult FMissionMultiTaskBase::DoAction()
 {
-	/**등록된 서브 태스크가 없음*/
 	if (SubTaskList.IsEmpty())
 		return ETaskExecutorResult::Complete;
 
 	if (false == OccupiedTask.IsValid())
 	{
-		/**남은 서브 태스크가 없음*/
 		if (false == SubTaskList.IsValidIndex(Step))
 			return  ETaskExecutorResult::Complete;
 
@@ -93,8 +90,8 @@ void FMissionTask_MarchOn::SetData(TSharedPtr<FMissionTaskInfo> inTaskInfo)
 {
 	FMissionTaskBase::SetData(inTaskInfo);
 	
-	ActorID = 0; // 액터 아이디
-	TileIndex = -1;		// 목적지의 타일 인덱스
+	ActorID = 0;
+	TileIndex = -1;
 	//TileIndex = inTaskInfo->TileIndex;
 
 	//if (inTaskInfo->TaskType == EInGameTaskType::MARCH_ON)
@@ -115,8 +112,6 @@ ETaskExecutorResult FMissionTask_MarchOn::DoAction()
 	//if (nullptr == entity)
 	//	return ETaskExecutorResult::Fail;
 
-	////entity 에게 이동을 명령한다.
-	////자신의 턴에 Character가 entity에 등록된 정보를 가져가자.
 	//entity->SetDestination(TileIndex);
 	return  ETaskExecutorResult::Complete;
 }
@@ -130,7 +125,6 @@ FMissionTask_Spawn::FMissionTask_Spawn()
 
 void FMissionTask_Spawn::SetData(TSharedPtr<FMissionTaskInfo> inTaskInfo)
 {
-	// 작동할 타일 위치 가져오기
 	FMissionTaskBase::SetData(inTaskInfo);
 
 	/*TileIndex = inTaskInfo->TileIndex;
@@ -158,9 +152,7 @@ ETaskExecutorResult FMissionTask_Spawn::DoAction()
 	//if (false == entity.IsValid())
 	//	return ETaskExecutorResult::Fail;
 
-	////Todo 나중에 TileIndex를 기준으로 화면에 보이는 애들만 스폰시키자.
 	//manager->CreateActor(entity);
-
 
 	return ETaskExecutorResult::Complete;
 }
@@ -179,7 +171,6 @@ void FMissionTask_SetCamera::SetData(TSharedPtr<FMissionTaskInfo> inTaskInfo)
 
 ETaskExecutorResult FMissionTask_SetCamera::DoAction()
 {
-	//Todo 설정된 좌표에(TileIndex)로 카메라를 움직인다.
 	/*UAlphaGameInstance* gameInstance = UAlphaGameInstance::Get();
 	if (false == IsValid(gameInstance))
 		return ETaskExecutorResult::Fail;
@@ -218,6 +209,5 @@ ETaskExecutorResult FMissionTask_PlayDialog::DoAction()
 	//if(false == manager->PlayDialog(1))
 	//	return ETaskExecutorResult::Fail;
 	//
-	//Todo 임시로 즉시 종료시키기! 추후 다이얼로그 종료까지 ETaskExecutorResult::Progress; 를 리턴해야한다.
 	return ETaskExecutorResult::Complete;
 }

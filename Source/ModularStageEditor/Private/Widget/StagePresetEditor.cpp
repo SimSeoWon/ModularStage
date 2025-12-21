@@ -128,7 +128,7 @@ void UStagePresetEditor::CreatePrefabFromCollectedComponents(const TArray<AActor
 		OriginalActor->GetComponents(Components);
 		for (UActorComponent* Comp : Components)
 		{
-			if (Comp && !Comp->IsEditorOnly()) // 에디터 전용 컴포넌트는 제외한다.
+			if (Comp && !Comp->IsEditorOnly())
 			{
 				USCS_Node* NewNode = SCS->CreateNode(Comp->GetClass(), Comp->GetFName());
 				SCS->AddNode(NewNode);

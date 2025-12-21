@@ -42,6 +42,9 @@ protected:
 	UFUNCTION(CallInEditor, Category = "Spawner")
 	void ShowAsserBrowser();
 
+	UFUNCTION()
+	void OnSelectAssetPath(FString inPath);
+
 protected:
 
 	/** 컴포넌트를 뷰포트에서 나타낼 아이콘입니다. */

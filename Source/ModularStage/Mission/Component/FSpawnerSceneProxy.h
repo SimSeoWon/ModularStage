@@ -4,6 +4,7 @@
 #include "PrimitiveSceneProxy.h"
 
 class UMissionPropsComponent_Spawner;
+class FTexture;
 struct FMeshBatchAndRelevance;
 
 class FSpawnerSceneProxy : public FPrimitiveSceneProxy
@@ -17,8 +18,7 @@ public:
     SIZE_T GetAllocatedSize() const { return FPrimitiveSceneProxy::GetAllocatedSize(); }
 
 private:
-    
-    TObjectPtr<UTexture2D> SpriteIcon;
+    FTexture* TextureResource;
     TArray<FVector> SpawnPoints;
     TArray<FVector> PatrolPoints;
     bool IsShowDebug = true;

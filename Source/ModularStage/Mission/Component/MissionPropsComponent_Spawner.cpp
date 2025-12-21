@@ -18,29 +18,22 @@ UMissionPropsComponent_Spawner::UMissionPropsComponent_Spawner()
 	//bIsEditorOnly = true;
 }
 
-// !! 중요: CalcBounds 함수 구현
 FBoxSphereBounds UMissionPropsComponent_Spawner::CalcBounds(const FTransform& LocalToWorld) const
 {
-    // 모든 SpawnPoints와 PatrolPoints를 포함하는 FBox를 생성합니다.
-    // 만약 점이 하나도 없다면 컴포넌트 위치를 기준으로 작은 박스를 만듭니다.
     if (SpawnPoints.Num() == 0 && PatrolPoints.Num() == 0)
     {
         return FBoxSphereBounds(LocalToWorld.GetLocation(), FVector(10.0f), 10.0f);
     }
 
-    // TArray<FVector>를 사용 중이므로 FBox에 모든 점을 추가합니다.
     TArray<FVector> AllPoints = SpawnPoints;
     AllPoints.Append(PatrolPoints);
 
-    // FBox(Points, Count) 생성자는 TArray<FVector>를 직접 받지 않으므로,
-    // FBox(EForceInit)로 초기화하고 수동으로 점을 추가합니다.
     FBox BoundingBox(EForceInit::ForceInit);
     for (const FVector& Point : AllPoints)
     {
         BoundingBox += Point;
     }
 
-    // 로컬 스페이스의 BoundingBox를 World-Space FBoxSphereBounds로 변환하여 반환합니다.
     return FBoxSphereBounds(BoundingBox.TransformBy(LocalToWorld));
 }
 
@@ -77,6 +70,12 @@ void UMissionPropsComponent_Spawner::ShowAsserBrowser()
 	if (false == IsValid(editor))
 		return;
 
+    editor->GetOnAcceptAssetPath().BindUObject(this, &UMissionPropsComponent_Spawner::OnSelectAssetPath);
 	editor->Run();
 #endif
+}
+
+void UMissionPropsComponent_Spawner::OnSelectAssetPath(FString inPath)
+{
+
 }

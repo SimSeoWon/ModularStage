@@ -66,7 +66,7 @@ void UEditorView_InGameTask::OnClicked_SaveFile()
 	UDataTable* dtHexagonTileMap = LoadObject<UDataTable>(this, *FilePath);
 	if (dtHexagonTileMap)
 	{
-		/**직접 제거해야할까??*/
+		
 	}
 
 	CreateTableFile(FileName);
@@ -147,12 +147,10 @@ void UEditorView_InGameTask::OnClicked_AddTask()
 
 void UEditorView_InGameTask::OnClicked_TaskEdit(UEntryData_InGameTaskList* inEntryData) 
 {
-	/**태스크 상세 설정을 할 수 있도록 에디터 창을 하나 더 추가하자*/
-
 	if (false == IsValid(inEntryData))
 		return;
 
-	const FString DeleteInactiveEmitterUIPath = TEXT("EditorUtilityWidgetBlueprint'/Game/nevercook/editor/bp_EUW_InGameTaskdetail.bp_EUW_InGameTaskdetail'");
+	const FString DeleteInactiveEmitterUIPath = TEXT("EditorUtilityWidgetBlueprint'/Game/nevercook/editor/menu/bp_EUW_InGameTaskdetail.bp_EUW_InGameTaskdetail'");
 	FName tabID;
 	UEUW_InGameTaskEditor* editorWidget = FEditorSupport::ShowEditorUtilityWidget<UEUW_InGameTaskEditor>(DeleteInactiveEmitterUIPath, tabID);
 	if (false == IsValid(editorWidget))
@@ -186,7 +184,6 @@ void UEditorView_InGameTask::CreateTableFile(FString inFileName)
 
 	if (bSuccess)
 	{
-		// 컨텐츠 브라우저에 에셋 표시
 		TArray<UObject*> ObjectsToSync;
 		ObjectsToSync.Add(dataTable);
 		GEditor->SyncBrowserToObjects(ObjectsToSync);

@@ -26,8 +26,6 @@ public:
 	virtual bool IsCondition() { return true; }
 };
 
-
-//# UWidget이 켜있을 경우만 이벤트 수행
 //---------------------------------------------------------
 UINTERFACE()
 class UGlobalEventForWidget : public UGlobalEventListener

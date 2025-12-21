@@ -90,7 +90,8 @@ public class ModularStageEditor : ModuleRules
                 "DeveloperSettings",
                 "Persona",
                 "ContentBrowser",
-                "AdvancedPreviewScene", });
+                "AdvancedPreviewScene",
+                "Kismet"});
 
         // Uncomment if you are using Slate UI
         // PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });

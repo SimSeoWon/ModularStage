@@ -16,6 +16,10 @@
 #include "Visualizer/FVisualizer_Spawner.h"
 #include "Mission/Component/MissionPropsComponent_Spawner.h"
 #include "MeshGeneratorWidget.h"
+#include "PropertyEditorModule.h"
+#include "BeaconDetails.h"
+
+#include "Mission/Beacon.h"
 
 
 
@@ -61,6 +65,9 @@ void FModularStageEditor::StartupModule()
 		GUnrealEd->RegisterComponentVisualizer(UMissionPropsComponent_Spawner::StaticClass()->GetFName(), Visualizer);
 		Visualizer->OnRegister();
 	}
+
+	FPropertyEditorModule& PropertyModule = FModuleManager::LoadModuleChecked<FPropertyEditorModule>("PropertyEditor");
+	PropertyModule.RegisterCustomClassLayout(ABeacon::StaticClass()->GetFName(), FOnGetDetailCustomizationInstance::CreateStatic(&FBeaconDetails::MakeInstance));
 }
 
 void FModularStageEditor::ShutdownModule()
@@ -74,16 +81,22 @@ void FModularStageEditor::ShutdownModule()
 	{
 		GUnrealEd->UnregisterComponentVisualizer(UMissionPropsComponent_Spawner::StaticClass()->GetFName());
 	}
+
+	if (FModuleManager::Get().IsModuleLoaded("PropertyEditor"))
+	{
+		FPropertyEditorModule& PropertyModule = FModuleManager::GetModuleChecked<FPropertyEditorModule>("PropertyEditor");
+		PropertyModule.UnregisterCustomClassLayout(ABeacon::StaticClass()->GetFName());
+	}
 }
 
 void FModularStageEditor::OnRegistration_WorkflowTab()
 {
 	FBlueprintEditorModule& module = FModuleManager::LoadModuleChecked<FBlueprintEditorModule>("Kismet");
 	RegisterTabsDelegateHandle = module.OnRegisterTabsForEditor().AddLambda(
-		// InBlueprintEditor: ���� �����Ǵ� ������rint �������� �ν��Ͻ�
+		
 		[](FWorkflowAllowedTabSet& TabFactories, FName InModeName, TSharedPtr<FBlueprintEditor> InBlueprintEditor)
 		{
-			// FWorkflowTabFactory�� ��ӹ��� �츮 Ŀ���� ���丮�� �����Ͽ� ����մϴ�.
+		
 			TSharedPtr<FWorkflowTabFactory_Mission> factory = MakeShareable(new FWorkflowTabFactory_Mission(InBlueprintEditor));
 			if (false == factory.IsValid())
 				return;

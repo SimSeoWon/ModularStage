@@ -34,7 +34,7 @@
 		if (!btn->OnUnhovered.IsAlreadyBound(this, func)) btn->OnUnhovered.AddDynamic(this, func); \
 	}
 
-//# UI 사운드
+
 //------------------------------------------------------------------------
 void UIPlaySound(UWidget* This, const FName& InSoundName);
 #define UI_PLAYSOUND(soundName) UIPlaySound(this, soundName);
@@ -43,7 +43,7 @@ void UIPlaySound(UWidget* This, const FName& InSoundName);
 /**
  *
  */
-UCLASS(Abstract) /** 추상 클래스임을 나타내는 지정자.*/
+UCLASS(Abstract) 
 class MODULARSTAGE_API UUIWidgetBase : public UUserWidget
 {
 	GENERATED_BODY()

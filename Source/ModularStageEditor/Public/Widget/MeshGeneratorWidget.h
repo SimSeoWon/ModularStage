@@ -28,7 +28,7 @@ public:
 	static FText GetMenuDisplayName() { return FText::FromString(TEXT("Mesh Generator Editor")); }
 	static FText GetMenuTooltip() { return FText::FromString(TEXT("Mesh Generator Editor")); }
 
-	static FString GetWidgetBlueprintPath() { return TEXT("/Game/nevercook/editor/BP_MeshGeneratorWidget.BP_MeshGeneratorWidget"); }
+	static FString GetWidgetBlueprintPath() { return TEXT("/Game/nevercook/editor/menu/BP_MeshGeneratorWidget.BP_MeshGeneratorWidget"); }
 
 public:
 	/** Sets the target prefab that this widget will operate on. */

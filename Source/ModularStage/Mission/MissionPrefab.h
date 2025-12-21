@@ -33,12 +33,8 @@ public:
     UFUNCTION(CallInEditor, Category = "Prefab | Mesh Generation")
     void OpenMeshGenerator();
 
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Prefab")
-	TObjectPtr<UStaticMeshComponent> GeneratedMeshComponent;
-
-    /** Defines the size of the simple box obstacle to generate. */
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Prefab | Mesh Generation")
-    FVector ObstacleExtent;
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mission")
@@ -47,8 +43,13 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+public:
 
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Prefab")
+	TObjectPtr<UStaticMeshComponent> GeneratedMeshComponent;
+
+	/** Defines the size of the simple box obstacle to generate. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Prefab | Mesh Generation")
+	FVector ObstacleExtent;
 };

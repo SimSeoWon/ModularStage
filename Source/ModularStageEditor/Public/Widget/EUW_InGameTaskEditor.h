@@ -33,6 +33,6 @@ protected:
 	UPROPERTY(meta = (BindWidget))
 	UEditorView_InGameTaskEditor* EditorView = nullptr;
 
-	TFunction<void(TArray<UAlphaEntryData_MonsterSquad*>&)> Function_SpawnMonsterList = nullptr;        //스폰된 몬스터 목록을 가져오자.
+	TFunction<void(TArray<UAlphaEntryData_MonsterSquad*>&)> Function_SpawnMonsterList = nullptr;
 	
 };

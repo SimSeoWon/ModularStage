@@ -20,7 +20,7 @@ public:
 	static FText GetMenuDisplayName() { return FText::FromString(TEXT("Modular Stage Editor")); }
 	static FText GetMenuTooltip() { return FText::FromString(TEXT("Modular Stage Editor")); }
 
-	static FString GetWidgetBlueprintPath() { return TEXT("/Game/nevercook/editor/BP_StagePresetEditor.BP_StagePresetEditor"); }
+	static FString GetWidgetBlueprintPath() { return TEXT("/Game/nevercook/editor/menu/BP_StagePresetEditor.BP_StagePresetEditor"); }
 
 protected:
 	virtual void NativeConstruct() override;

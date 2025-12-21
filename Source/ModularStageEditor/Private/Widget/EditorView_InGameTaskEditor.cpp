@@ -199,7 +199,7 @@ void UEditorView_InGameTaskEditor::OnClicked_Btn_ActorList()
 	if (false == IsValid(EntryData))
 		return;
 
-	const FString DeleteInactiveEmitterUIPath = TEXT("EditorUtilityWidgetBlueprint'/Game/nevercook/editor/bp_alphaeuw_actorlist.bp_alphaeuw_actorlist'");
+	const FString DeleteInactiveEmitterUIPath = TEXT("EditorUtilityWidgetBlueprint'/Game/nevercook/editor/menu/bp_alphaeuw_actorlist.bp_alphaeuw_actorlist'");
 	FName tabID;
 }
 
@@ -208,7 +208,7 @@ void UEditorView_InGameTaskEditor::OnClicked_MonsterList()
 	if (false == IsValid(EntryData))
 		return;
 
-	const FString DeleteInactiveEmitterUIPath = TEXT("EditorUtilityWidgetBlueprint'/Game/nevercook/editor/bp_alphaeuw_monsterlist.bp_alphaeuw_monsterlist'");
+	const FString DeleteInactiveEmitterUIPath = TEXT("EditorUtilityWidgetBlueprint'/Game/nevercook/editor/menu/bp_alphaeuw_monsterlist.bp_alphaeuw_monsterlist'");
 	FName tabID;
 }
 
@@ -244,7 +244,7 @@ void UEditorView_InGameTaskEditor::OnClicked_Save()
 	EntryData->Step = step;
 	EntryData->Type = type;
 	//EntryData->Index = index;
-	EntryData->RefreshUI(); //에디터에 UI를 갱신한다.
+	EntryData->RefreshUI();
 }
 
 void UEditorView_InGameTaskEditor::OnChanged_TaskType(FString inSelectedItem, ESelectInfo::Type inSelectType)

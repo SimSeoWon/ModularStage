@@ -98,14 +98,14 @@ protected:
 	//UPROPERTY(meta = (BindWidget))
 	//UTextBlock* Txt_SpawnActorID = nullptr;
 	//UPROPERTY(meta = (BindWidget))
-	//UButton* Btn_MonsterList = nullptr; // 몬스터 테이블을 보여준다.
+	//UButton* Btn_MonsterList = nullptr;
 
 	//UPROPERTY(meta = (BindWidget))
 	//UPanelWidget* Panel_MarchOn = nullptr;
 	//UPROPERTY(meta = (BindWidget))
 	//UTextBlock* Txt_ActorID = nullptr;
 	//UPROPERTY(meta = (BindWidget))
-	//UButton* Btn_ActorList = nullptr; // 액터 목록을 보여준다.
+	//UButton* Btn_ActorList = nullptr;
 
 	UPROPERTY()
 	UEntryData_InGameTaskList* EntryData = nullptr;
