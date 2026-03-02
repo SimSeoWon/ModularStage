@@ -19,8 +19,6 @@
 
 #include "ModularStage/Table/TableEnum.h"
 #include "ModularStage/Table/MissionTaskTable.h"
-#include "ModularStage/Table/MissionTaskFunctor.h"
-
 
 void UEditorView_InGameTask::Run()
 {
@@ -99,8 +97,11 @@ void UEditorView_InGameTask::OnClicked_LoadFile()
 			entryData->Step = rowData->TaskList[i].Step;
 			entryData->Title = rowData->TaskList[i].Title;
 			entryData->Desc = rowData->TaskList[i].Desc;
+			entryData->Type = rowData->TaskList[i].Type;
+			entryData->SerializeID = rowData->TaskList[i].SerializeID;
+			entryData->ParentID = rowData->TaskList[i].ParentID;
+			entryData->TaskDetail = rowData->TaskList[i].TaskDetail;
 			
-			entryData->IntegerParamList.Append(rowData->TaskList[i].IntegerParamList);
 			entryData->OnClicked_Edit.Unbind();
 			entryData->OnClicked_Edit.BindUObject(this, &UEditorView_InGameTask::OnClicked_TaskEdit);
 			EntryDataList.Add(entryData);
@@ -135,6 +136,7 @@ void UEditorView_InGameTask::OnClicked_AddTask()
 	entryData->Step = EntryDataList.Num();
 	entryData->Title = TEXT("Task Title");
 	entryData->Desc = TEXT("Task Desc");
+	entryData->SerializeID = FGuid::NewGuid();
 	entryData->OnClicked_Edit.Unbind();
 	entryData->OnClicked_Edit.BindUObject(this, &UEditorView_InGameTask::OnClicked_TaskEdit);
 	EntryDataList.Add(entryData);
@@ -204,7 +206,10 @@ void UEditorView_InGameTask::SetTableData(UDataTable* inDataTable)
 		taskInfo.Step = EntryDataList[i]->Step;
 		taskInfo.Title = EntryDataList[i]->Title;
 		taskInfo.Desc = EntryDataList[i]->Desc;
-		taskInfo.IntegerParamList.Append(EntryDataList[i]->IntegerParamList);
+		taskInfo.Type = EntryDataList[i]->Type;
+		taskInfo.SerializeID = EntryDataList[i]->SerializeID;
+		taskInfo.ParentID = EntryDataList[i]->ParentID;
+		taskInfo.TaskDetail = EntryDataList[i]->TaskDetail;
 		rowData.TaskList.Add(taskInfo);
 	}
 

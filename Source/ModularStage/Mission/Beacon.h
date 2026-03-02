@@ -8,6 +8,7 @@
 #include "Engine/AssetManager.h"
 #include "NavigationSystem.h"
 #include "Components/StaticMeshComponent.h"
+#include "ModularStage/Table/TableEnum.h"
 #include "Beacon.generated.h"
 
 UCLASS()
@@ -63,6 +64,12 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite);
 	FString PrefabAssetPath;
+
+	UPROPERTY(EditAnywhere, Category = "Mission")
+	EMissionType MissionType = EMissionType::Main;
+
+	UPROPERTY(EditAnywhere, Category = "Mission", meta = (EditCondition = "MissionType == EMissionType::Main"))
+	int32 ExecutionOrder = 0;
 
 	UPROPERTY(Transient)
 	class UChildActorComponent* PreviewComp;

@@ -26,12 +26,15 @@ public class ModularStage : ModuleRules
             "ProceduralMeshComponent",
             "MeshDescription",
             "StaticMeshDescription",
+            "GeometryCollectionEngine",
+            "RenderCore",
+            "StructUtils",
         });
         PrivateDependencyModuleNames.AddRange(new string[]
         {
             "Slate",
             "SlateCore",
-            "UMG" // UButton °æ°íµµ ÀÖÀ¸¹Ç·Î UMGµµ ÇÊ¿äÇÕ´Ï´Ù.
+            "UMG" // UButton ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ UMGï¿½ï¿½ ï¿½Ê¿ï¿½ï¿½Õ´Ï´ï¿½.
         });
 
         AddIncludePath(ref PrivateIncludePaths, "ModularStage");

@@ -7,7 +7,7 @@
 
 void UEUW_InGameTaskEditor::Run() 
 {
-	EditorView->Run(this);
+	//EditorView->Run(this);
 }
 
 void UEUW_InGameTaskEditor::SetData(UEntryData_InGameTaskList* inEntryData) 

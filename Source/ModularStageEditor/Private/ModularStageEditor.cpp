@@ -16,8 +16,10 @@
 #include "Visualizer/FVisualizer_Spawner.h"
 #include "Mission/Component/MissionPropsComponent_Spawner.h"
 #include "MeshGeneratorWidget.h"
+#include "Widget/PrefabEditorWidget.h"
 #include "PropertyEditorModule.h"
 #include "BeaconDetails.h"
+#include "ModularStageEditorView_HexTile.h"
 
 #include "Mission/Beacon.h"
 
@@ -115,8 +117,10 @@ void FModularStageEditor::SetEditorMenu()
 
 		// Register the editor menus using the new template function
 		RegisterEditorMenu<UStagePresetEditor>(MenuHelper, TEXT("ModularStage"));
+		RegisterEditorMenu<UModularStageEditorView_HexTile>(MenuHelper, TEXT("ModularStage"));
 		RegisterEditorMenu<UEUW_InGameTask>(MenuHelper, TEXT("MissionTask"));
 		RegisterEditorMenu<UMeshGeneratorWidget>(MenuHelper, TEXT("MeshGenerator"));
+		RegisterEditorMenu<UPrefabEditorWidget>(MenuHelper, TEXT("PrefabEditor"));
 		
 	}
 }

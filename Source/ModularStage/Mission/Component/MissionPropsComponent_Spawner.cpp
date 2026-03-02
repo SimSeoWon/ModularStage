@@ -3,6 +3,7 @@
 #include "MissionPropsComponent_Spawner.h"
 #include "Engine/CollisionProfile.h"
 #include "FSpawnerSceneProxy.h"
+#include "Misc/Guid.h"
 
 #if WITH_EDITOR
 #include "ModularStageEditor/Public/Widget/EditorWidget_AssetSelector.h"
@@ -18,28 +19,67 @@ UMissionPropsComponent_Spawner::UMissionPropsComponent_Spawner()
 	//bIsEditorOnly = true;
 }
 
+FGuid UMissionPropsComponent_Spawner::GetGuid() const
+{
+	return ComponentGuid;
+}
+
+void UMissionPropsComponent_Spawner::SetGuid(const FGuid& InGuid)
+{
+	ComponentGuid = InGuid;
+}
+
+void UMissionPropsComponent_Spawner::PostInitProperties()
+{
+	Super::PostInitProperties();
+	if (!ComponentGuid.IsValid())
+	{
+		ComponentGuid = FGuid::NewGuid();
+	}
+}
+
 FBoxSphereBounds UMissionPropsComponent_Spawner::CalcBounds(const FTransform& LocalToWorld) const
 {
-    if (SpawnPoints.Num() == 0 && PatrolPoints.Num() == 0)
+    AMissionPrefab* ParentPrefab = Cast<AMissionPrefab>(GetOwner());
+    if (!ParentPrefab)
     {
         return FBoxSphereBounds(LocalToWorld.GetLocation(), FVector(10.0f), 10.0f);
     }
 
-    TArray<FVector> AllPoints = SpawnPoints;
-    AllPoints.Append(PatrolPoints);
-
     FBox BoundingBox(EForceInit::ForceInit);
-    for (const FVector& Point : AllPoints)
+
+    // 스폰 지점 인덱스를 월드 좌표로 변환하여 바운딩 박스 계산
+    for (int32 Index : SpawnTileIndices)
     {
-        BoundingBox += Point;
+        FVector RelativePos = ParentPrefab->GetTileLocation(Index);
+        BoundingBox += RelativePos;
     }
 
+    // 순찰 지점 인덱스도 포함
+    for (int32 Index : PatrolTileIndices)
+    {
+        FVector RelativePos = ParentPrefab->GetTileLocation(Index);
+        BoundingBox += RelativePos;
+    }
+
+    // 데이터가 없는 경우 기본값
+    if (!BoundingBox.IsValid)
+    {
+        return FBoxSphereBounds(LocalToWorld.GetLocation(), FVector(50.0f), 50.0f);
+    }
+
+    // 컴포넌트 위치(로컬) 기준의 바운딩 박스를 월드 좌표로 변환
     return FBoxSphereBounds(BoundingBox.TransformBy(LocalToWorld));
 }
 
 FPrimitiveSceneProxy* UMissionPropsComponent_Spawner::CreateSceneProxy()
 {
-    UE_LOG(LogTemp, Warning, TEXT("UMissionPropsComponent_Spawner::CreateSceneProxy() called!"));
+    if (this->GetOwner() == nullptr)
+    {
+        return nullptr;
+    }
+    
+    UE_LOG(LogTemp, Warning, TEXT("UMissionPropsComponent_Spawner::CreateSceneProxy() called for %s"), *GetName());
     return new FSpawnerSceneProxy(this);
 }
 

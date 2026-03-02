@@ -16,6 +16,7 @@ class MODULARSTAGE_API UMissionPropsComponent_Spawner : public UPrimitiveCompone
 
 #if WITH_EDITOR
 	friend class FVisualizer_Spawner;
+	friend class UPrefabEditorWidget;
 #endif
 
 	friend class FSpawnerSceneProxy;
@@ -30,9 +31,27 @@ public:
 	virtual FBoxSphereBounds CalcBounds(const FTransform& LocalToWorld) const override;
 
 	//~ Begin IMissionPropComponent Interface
+	virtual void SetGuid(const FGuid& InGuid) override;
+	virtual FGuid GetGuid() const override;
 	virtual void OnActivate() override;
 	virtual void OnDeactivate() override;
+	virtual void SetHexTileIndex(int32 InIndex) override { HexTileIndex = InIndex; }
+	virtual int32 GetHexTileIndex() const override { return HexTileIndex; }
 	//~ End IMissionPropComponent Interface
+
+	virtual void PostInitProperties() override;
+
+	void SetResourcesPath(const FString& InPath) { ResourcesPath = InPath; }
+
+protected:
+	/** 이 컴포넌트가 배치될 헥스 타일 인덱스 (0~6) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MissionProp | HexGrid")
+	int32 HexTileIndex = 0;
+
+private:
+	/** A unique identifier for this component instance. */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="MissionProp", meta=(AllowPrivateAccess="true"))
+	FGuid ComponentGuid;
 
 protected:
 	virtual void BeginPlay() override;
@@ -54,12 +73,14 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Spawner")
 	FString ResourcesPath;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawner", meta = (MakeEditWidget = true))
-	TArray<FVector> SpawnPoints;
+	/** 이 스포너가 몬스터를 생성할 타일 인덱스 목록 (0~6) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawner | HexGrid")
+	TArray<int32> SpawnTileIndices;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawner", meta = (MakeEditWidget = true))
-	TArray<FVector> PatrolPoints;
+	/** 몬스터가 순찰할 타일 인덱스 목록 (0~6) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawner | HexGrid")
+	TArray<int32> PatrolTileIndices;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawner", meta = (MakeEditWidget = true))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawner")
 	bool IsShowDebug = true;
 };

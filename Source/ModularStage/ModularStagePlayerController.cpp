@@ -42,6 +42,7 @@ void AModularStagePlayerController::SetupInputComponent()
 	// Set up action bindings
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(InputComponent))
 	{
+		
 		// Setup mouse input events
 		EnhancedInputComponent->BindAction(SetDestinationClickAction, ETriggerEvent::Started, this, &AModularStagePlayerController::OnInputStarted);
 		EnhancedInputComponent->BindAction(SetDestinationClickAction, ETriggerEvent::Triggered, this, &AModularStagePlayerController::OnSetDestinationTriggered);
@@ -53,11 +54,70 @@ void AModularStagePlayerController::SetupInputComponent()
 		EnhancedInputComponent->BindAction(SetDestinationTouchAction, ETriggerEvent::Triggered, this, &AModularStagePlayerController::OnTouchTriggered);
 		EnhancedInputComponent->BindAction(SetDestinationTouchAction, ETriggerEvent::Completed, this, &AModularStagePlayerController::OnTouchReleased);
 		EnhancedInputComponent->BindAction(SetDestinationTouchAction, ETriggerEvent::Canceled, this, &AModularStagePlayerController::OnTouchReleased);
+
+		// Setup mouse input events
+		EnhancedInputComponent->BindAction(SetTestClickAction, ETriggerEvent::Started, this, &AModularStagePlayerController::OnInputStarted2);
+		EnhancedInputComponent->BindAction(SetTestClickAction, ETriggerEvent::Triggered, this, &AModularStagePlayerController::OnSetDestinationTriggered2);
+		EnhancedInputComponent->BindAction(SetTestClickAction, ETriggerEvent::Completed, this, &AModularStagePlayerController::OnSetDestinationReleased2);
+		EnhancedInputComponent->BindAction(SetTestClickAction, ETriggerEvent::Canceled, this, &AModularStagePlayerController::OnSetDestinationReleased2);
+
+		// Setup touch input events
+		EnhancedInputComponent->BindAction(SetTestTouchAction, ETriggerEvent::Started, this, &AModularStagePlayerController::OnInputStarted2);
+		EnhancedInputComponent->BindAction(SetTestTouchAction, ETriggerEvent::Triggered, this, &AModularStagePlayerController::OnTouchTriggered2);
+		EnhancedInputComponent->BindAction(SetTestTouchAction, ETriggerEvent::Completed, this, &AModularStagePlayerController::OnTouchReleased2);
+		EnhancedInputComponent->BindAction(SetTestTouchAction, ETriggerEvent::Canceled, this, &AModularStagePlayerController::OnTouchReleased2);
+
+		// Setup cheat click action
+		EnhancedInputComponent->BindAction(CheatClickAction, ETriggerEvent::Started, this, &AModularStagePlayerController::OnCheatClick);
+
 	}
 	else
 	{
 		UE_LOG(LogTemplateCharacter, Error, TEXT("'%s' Failed to find an Enhanced Input Component! This template is built to use the Enhanced Input system. If you intend to use the legacy system, then you will need to update this C++ file."), *GetNameSafe(this));
 	}
+}
+
+void AModularStagePlayerController::OnCheatClick()
+{
+	if (AModularStageCharacter* character = Cast<AModularStageCharacter>(GetPawn()))
+	{
+		if (character->IsInActionState())
+		{
+			character->ExitActionState();
+			UE_LOG(LogTemp, Log, TEXT("Exiting Action State via Cheat"));
+		}
+		else
+		{
+			// 데이터 테이블에 "Carry"라는 행 이름이 있다고 가정
+			character->EnterActionState(TEXT("Carry"));
+			UE_LOG(LogTemp, Log, TEXT("Entering Action State 'Carry' via Cheat"));
+		}
+	}
+}
+
+void AModularStagePlayerController::OnInputStarted2()
+{
+	OnInputStarted();
+}
+
+void AModularStagePlayerController::OnSetDestinationTriggered2()
+{
+	OnSetDestinationTriggered();
+}
+
+void AModularStagePlayerController::OnSetDestinationReleased2()
+{
+	OnSetDestinationReleased();
+}
+
+void AModularStagePlayerController::OnTouchTriggered2()
+{
+	OnTouchTriggered();
+}
+
+void AModularStagePlayerController::OnTouchReleased2()
+{
+	OnTouchReleased();
 }
 
 void AModularStagePlayerController::OnInputStarted()
@@ -70,7 +130,7 @@ void AModularStagePlayerController::OnSetDestinationTriggered()
 {
 	// We flag that the input is being pressed
 	FollowTime += GetWorld()->GetDeltaSeconds();
-	
+
 	// We look for the location in the world where the player has pressed the input
 	FHitResult Hit;
 	bool bHitSuccessful = false;
@@ -88,7 +148,7 @@ void AModularStagePlayerController::OnSetDestinationTriggered()
 	{
 		CachedDestination = Hit.Location;
 	}
-	
+
 	// Move towards mouse pointer or touch
 	APawn* ControlledPawn = GetPawn();
 	if (ControlledPawn != nullptr)

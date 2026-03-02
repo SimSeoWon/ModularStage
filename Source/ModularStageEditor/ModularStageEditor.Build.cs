@@ -47,6 +47,7 @@ public class ModularStageEditor : ModuleRules
                 "MeshDescription",
                 "AssetManagerEditor",
                 "BlueprintEditorLibrary",
+                "StructUtils",
             });
 
 		PrivateDependencyModuleNames.AddRange(new string[] 

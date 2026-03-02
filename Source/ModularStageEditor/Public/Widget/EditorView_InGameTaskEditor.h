@@ -14,6 +14,10 @@ class UButton;
 class UComboBoxString;
 class UEntryData_InGameTaskList;
 class UEUW_InGameTaskEditor;
+class UEditorView_MissionTaskEditor;
+class UEditorView_SpawnMonsterTaskEditor;
+class UEditorView_SpawnObjectTask;
+
 
 enum class EInGameTaskType : uint8;
 /**
@@ -24,13 +28,24 @@ class UEditorView_InGameTaskEditor : public UEditorUtilityWidget
 {
 	GENERATED_BODY()
 
-public :
-	void Run(UEUW_InGameTaskEditor* inOwner);
+protected:
+	virtual void NativeConstruct() override;
+	virtual void NativeDestruct() override;
 
+public :
 	void SetData(UEntryData_InGameTaskList* inEntryData);
+
+	DECLARE_DELEGATE_OneParam(OnEditorEventDelegate, UEditorView_InGameTaskEditor*)
+	OnEditorEventDelegate& GetOnClosedEvent()
+	{
+		return OnClosedEvent;
+	}
 
 	UFUNCTION()
 	void OnClicked_Save();
+
+	UFUNCTION()
+	void OnClicked_Close();
 
 	UFUNCTION()
 	void OnClicked_MonsterList();
@@ -42,9 +57,6 @@ public :
 	void OnChanged_TaskType(FString inSelectedItem, ESelectInfo::Type inSelectType);
 
 	UFUNCTION()
-	void OnChanged_TileIndex(FString inSelectedItem, ESelectInfo::Type inSelectType);
-
-	UFUNCTION()
 	void OnSelected_HexagonTile(const FVector2D inPos = FVector2D::Zero());
 
 	UFUNCTION()
@@ -54,6 +66,9 @@ public :
 	void OnSelectedActor();
 
 #pragma region Setting Detail widget 
+protected:
+	void OnRegisterFunctionMap();
+
 	UFUNCTION()
 	void SetDetail();
 
@@ -61,14 +76,42 @@ public :
 	void SetDetail_NONE();
 
 	UFUNCTION()
-	void SetDetail_SPAWN();
+	void SetDetail_SPAWN_MONSTER();
 
 	UFUNCTION()
-	void SetDetail_MARCH_ON();
-#pragma endregion
+	void SetDetail_SPAWN_OBJECT();
+
+	UFUNCTION()
+	void SetDetail_MISSION();
+
 protected:
-	void LoadFile();
-	void OnRegisterFunctionMap();
+	UPROPERTY(meta = (BindWidget))
+	UWidgetSwitcher* Switcher_Detail = nullptr;
+
+	UPROPERTY(meta = (BindWidget))
+	UPanelWidget* Panel_Empty = nullptr;
+
+	UPROPERTY(meta = (BindWidget))
+	UPanelWidget* Panel_SpawnMonster = nullptr;
+
+	UPROPERTY(meta = (BindWidget))
+	UEditorView_SpawnMonsterTaskEditor* SpawnMonster = nullptr;
+
+	UPROPERTY(meta = (BindWidget))
+	UPanelWidget* Panel_SpawnObject = nullptr;
+
+	UPROPERTY(meta = (BindWidget))
+	UEditorView_SpawnObjectTask* SpawnObject = nullptr;
+
+	UPROPERTY(meta = (BindWidget))
+	UPanelWidget* Panel_Mission = nullptr;
+
+	UPROPERTY(meta = (BindWidget))
+	UEditorView_MissionTaskEditor* MissionTaskEditor = nullptr;
+
+	TMap<EInGameTaskType, UFunction*> FunctionMap;
+#pragma endregion
+
 protected:
 	UPROPERTY(meta = (BindWidget))
 	UEditableTextBox* TextBox_Step = nullptr;
@@ -83,35 +126,21 @@ protected:
 	UComboBoxString* ComboBox_Type = nullptr;
 
 	UPROPERTY(meta = (BindWidget))
+	UButton* Btn_Close = nullptr;
+
+	UPROPERTY(meta = (BindWidget))
 	UButton* Btn_Save = nullptr;
 
-	UPROPERTY(meta = (BindWidget))
-	UWidgetSwitcher* Switcher_Detail = nullptr;
 
-	UPROPERTY(meta = (BindWidget))
-	UPanelWidget* Panel_Empty = nullptr;
-
-	UPROPERTY(meta = (BindWidget))
-	UPanelWidget* Panel_SPAWN = nullptr;
-	//UPROPERTY(meta = (BindWidget))
-	//UTextBlock* Txt_MonsterID = nullptr;
-	//UPROPERTY(meta = (BindWidget))
-	//UTextBlock* Txt_SpawnActorID = nullptr;
-	//UPROPERTY(meta = (BindWidget))
-	//UButton* Btn_MonsterList = nullptr;
-
-	//UPROPERTY(meta = (BindWidget))
-	//UPanelWidget* Panel_MarchOn = nullptr;
-	//UPROPERTY(meta = (BindWidget))
-	//UTextBlock* Txt_ActorID = nullptr;
-	//UPROPERTY(meta = (BindWidget))
-	//UButton* Btn_ActorList = nullptr;
-
+	
 	UPROPERTY()
 	UEntryData_InGameTaskList* EntryData = nullptr;
 
 	UPROPERTY()
 	UEUW_InGameTaskEditor* Owner = nullptr;
 
-	TMap<EInGameTaskType, UFunction*> FunctionMap;
+	
+
+
+	OnEditorEventDelegate OnClosedEvent;
 };

@@ -29,8 +29,8 @@ public:
 	virtual bool ShouldCreateSubsystem(UObject* Outer) const override;
 
 protected:
-	void OnPreLoadMap(const FString& string);
-	void OnPostLoadMap(UWorld* world);
+	virtual void OnPreLoadMap(const FString& string);
+	virtual void OnPostLoadMap(UWorld* world);
 
 protected:
 	bool IsLoading = false;

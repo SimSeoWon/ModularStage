@@ -2,6 +2,9 @@
 #include "Engine/World.h"
 #include "GameFramework/Character.h"
 #include "Kismet/GameplayStatics.h"
+#include "Misc/Guid.h"
+#include "ModularStage/Mission/MissionPrefab.h"
+#include "ModularStage/ModularStageDefine.h"
 
 //#include "MissionManager.h"
 
@@ -14,6 +17,52 @@ UMissionPropsComponent_Trigger::UMissionPropsComponent_Trigger()
 
 	OnComponentBeginOverlap.AddDynamic(this, &UMissionPropsComponent_Trigger::OnOverlapBegin);
 }
+
+FGuid UMissionPropsComponent_Trigger::GetGuid() const
+{
+	return ComponentGuid;
+}
+
+void UMissionPropsComponent_Trigger::SetGuid(const FGuid& InGuid)
+{
+	ComponentGuid = InGuid;
+}
+
+void UMissionPropsComponent_Trigger::PostInitProperties()
+{
+	Super::PostInitProperties();
+	if (!ComponentGuid.IsValid())
+	{
+		ComponentGuid = FGuid::NewGuid();
+	}
+
+#if WITH_EDITOR
+	// [FIX] CDO가 아닌 실제 인스턴스일 때만 헥스 타일 기반 크기 초기화
+	if (!HasAnyFlags(RF_ClassDefaultObject))
+	{
+		float R = ModularStageDefine::HexGrid::TILE_SIZE;
+		SetBoxExtent(FVector(R * 0.866f, R, 100.0f));
+	}
+#endif
+}
+
+#if WITH_EDITOR
+void UMissionPropsComponent_Trigger::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
+{
+	Super::PostEditChangeProperty(PropertyChangedEvent);
+
+	FName PropertyName = (PropertyChangedEvent.Property != nullptr) ? PropertyChangedEvent.Property->GetFName() : NAME_None;
+
+	// 타일 인덱스가 바뀌면 부모 프리팹을 통해 위치를 한 번 더 갱신하도록 유도
+	if (PropertyName == GET_MEMBER_NAME_CHECKED(UMissionPropsComponent_Trigger, HexTileIndex))
+	{
+		if (AActor* Owner = GetOwner())
+		{
+			Owner->RerunConstructionScripts();
+		}
+	}
+}
+#endif
 
 void UMissionPropsComponent_Trigger::OnActivate() 
 {

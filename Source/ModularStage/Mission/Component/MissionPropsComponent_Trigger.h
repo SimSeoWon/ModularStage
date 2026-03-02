@@ -14,8 +14,30 @@ public:
 	// Sets default values for this component's properties
 	UMissionPropsComponent_Trigger();
 
+	//~ Begin IMissionPropComponent Interface
+	virtual void SetGuid(const FGuid& InGuid) override;
+	virtual FGuid GetGuid() const override;
 	virtual void OnActivate() override;
 	virtual void OnDeactivate() override;
+	virtual void SetHexTileIndex(int32 InIndex) override { HexTileIndex = InIndex; }
+	virtual int32 GetHexTileIndex() const override { return HexTileIndex; }
+	//~ End IMissionPropComponent Interface
+
+	virtual void PostInitProperties() override;
+
+#if WITH_EDITOR
+	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+#endif
+
+protected:
+	/** 이 컴포넌트가 배치될 헥스 타일 인덱스 (0~6) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MissionProp | HexGrid")
+	int32 HexTileIndex = 0;
+
+private:
+	/** A unique identifier for this component instance. */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "MissionProp", meta = (AllowPrivateAccess = "true"))
+	FGuid ComponentGuid;
 
 protected:
 	// Called when the game starts

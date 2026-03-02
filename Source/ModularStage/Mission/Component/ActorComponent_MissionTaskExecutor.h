@@ -4,10 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "ModularStage/Table/TableEnum.h"
 
 #include "ActorComponent_MissionTaskExecutor.generated.h"
 
-class FMissionTaskExecutor;
+class UMissionTaskExecutor;
+struct FMissionTaskInfo;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class MODULARSTAGE_API UActorComponent_MissionTaskExecutor : public UActorComponent
@@ -17,15 +19,19 @@ class MODULARSTAGE_API UActorComponent_MissionTaskExecutor : public UActorCompon
 public:	
 	// Sets default values for this component's properties
 	UActorComponent_MissionTaskExecutor();
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	
+	bool SetData(const TArray<FMissionTaskInfo>& TaskList);
+	void SetExecutionInfo(EMissionType InType, int32 InOrder);
+	void RegisterWithManager();
 
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
-public:	
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 private:
-	TSharedPtr<FMissionTaskExecutor> Executor = nullptr;
+	UPROPERTY()
+	TObjectPtr<UMissionTaskExecutor> Executor = nullptr;
 };

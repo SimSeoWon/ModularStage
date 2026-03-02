@@ -35,12 +35,24 @@ public:
 	UInputMappingContext* DefaultMappingContext;
 	
 	/** Jump Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* CheatClickAction;
+
+	/** Jump Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
 	UInputAction* SetDestinationClickAction;
 
 	/** Jump Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
 	UInputAction* SetDestinationTouchAction;
+
+	/** Jump Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* SetTestClickAction;
+
+	/** Jump Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* SetTestTouchAction;
 
 protected:
 	/** True if the controlled character should navigate to the mouse cursor. */
@@ -57,6 +69,16 @@ protected:
 	void OnSetDestinationReleased();
 	void OnTouchTriggered();
 	void OnTouchReleased();
+
+	/** Input handlers for SetDestination action. */
+	void OnInputStarted2();
+	void OnSetDestinationTriggered2();
+	void OnSetDestinationReleased2();
+	void OnTouchTriggered2();
+	void OnTouchReleased2();
+
+	void OnCheatClick();
+	
 
 private:
 	FVector CachedDestination;

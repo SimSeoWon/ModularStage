@@ -10,36 +10,36 @@
 #include "Components/WidgetSwitcher.h"
 
 #include "UIListItem_InGameTask.h"
-
+#include "EditorView_MissionTaskEditor.h"
+#include "EditorView_SpawnMonsterTaskEditor.h"
 #include "EUW_InGameTaskEditor.h"
 #include "Support/EditorSupport.h"
+
 #include "ModularStage/Table/TableEnum.h"
 #include "ModularStage/Table/MissionTaskTable.h"
 
-void UEditorView_InGameTaskEditor::Run(UEUW_InGameTaskEditor* inOwner)
+void UEditorView_InGameTaskEditor::NativeConstruct()
 {
-	Owner = inOwner;
-
+	Super::NativeConstruct();
 	OnRegisterFunctionMap();
 
-	if (Btn_Save->OnClicked.IsBound())
-		Btn_Save->OnClicked.Clear();
-	Btn_Save->OnClicked.AddDynamic(this, &UEditorView_InGameTaskEditor::OnClicked_Save);
+	if (false == Btn_Save->OnClicked.IsBound())
+	{
+		Btn_Save->OnClicked.AddDynamic(this, &UEditorView_InGameTaskEditor::OnClicked_Save);
+	}
 
-	//if (Btn_MonsterList->OnClicked.IsBound())
-	//	Btn_MonsterList->OnClicked.Clear();
-	//Btn_MonsterList->OnClicked.AddDynamic(this, &UEditorView_InGameTaskEditor::OnClicked_MonsterList);
-
-	//if (Btn_ActorList->OnClicked.IsBound())
-	//	Btn_ActorList->OnClicked.Clear();
-
-	//Btn_ActorList->OnClicked.AddDynamic(this, &UEditorView_InGameTaskEditor::OnClicked_Btn_ActorList);
+	if (false == Btn_Close->OnClicked.IsBound())
+	{
+		Btn_Close->OnClicked.AddDynamic(this, &UEditorView_InGameTaskEditor::OnClicked_Close);
+	}
 
 	if (ComboBox_Type->OnSelectionChanged.IsBound())
+	{
 		ComboBox_Type->OnSelectionChanged.Clear();
+	}
 	ComboBox_Type->OnSelectionChanged.AddDynamic(this, &UEditorView_InGameTaskEditor::OnChanged_TaskType);
 
-	const UEnum* ptrEnum = FindObject<UEnum>(ANY_PACKAGE, TEXT("EInGameTaskType"), true);
+	const UEnum* ptrEnum = StaticEnum<EInGameTaskType>();
 	if (ptrEnum)
 	{
 		ComboBox_Type->ClearOptions();
@@ -52,45 +52,20 @@ void UEditorView_InGameTaskEditor::Run(UEUW_InGameTaskEditor* inOwner)
 		}
 	}
 
-	LoadFile();
-
 }
-
-void UEditorView_InGameTaskEditor::LoadFile()
+void UEditorView_InGameTaskEditor::NativeDestruct()
 {
-	FString strFileName = TEXT("");
-	FString strFilePath = TEXT("");
-
-	UWorld* world = GetWorld();
-	if (IsValid(world))
-	{
-		FString strWorldName;
-		world->GetName(strWorldName);
-		if (false == strWorldName.IsEmpty())
-		{
-			strFileName = FString::Printf(TEXT("res_%s"), *strWorldName);
-			strFilePath = FString::Printf(TEXT("DataTable'/Game/GameData/resourcetable/%s.%s'"), *strFileName, *strFileName);
-		}
-	}
-
-	float tileSize = 0.0f;
-	int32 column = 0;
-	int32 count = 0;
-
-	UDataTable* dtHexagonTileMap = LoadObject<UDataTable>(this, *strFilePath);
-	if (nullptr == dtHexagonTileMap)
-		return;
-
-	FMissionTaskTable* rowData = dtHexagonTileMap->FindRow<FMissionTaskTable>(FName(TEXT("TEST")), TEXT(""));
-	if (nullptr == rowData)
-		return;
 
 }
+
+
+
+#pragma region Setting Detail widget 
 
 void UEditorView_InGameTaskEditor::OnRegisterFunctionMap()
 {
 	FunctionMap.Reset();
-	const UEnum* ptrEnum = FindObject<UEnum>(ANY_PACKAGE, TEXT("EInGameTaskType"), true);
+	const UEnum* ptrEnum = StaticEnum<EInGameTaskType>();
 	if (nullptr == ptrEnum)
 		return;
 
@@ -107,7 +82,6 @@ void UEditorView_InGameTaskEditor::OnRegisterFunctionMap()
 	}
 }
 
-#pragma region Setting Detail widget 
 void UEditorView_InGameTaskEditor::SetDetail()
 {
 	Switcher_Detail->SetActiveWidget(Panel_Empty);
@@ -133,38 +107,61 @@ void UEditorView_InGameTaskEditor::SetDetail_NONE()
 	Switcher_Detail->SetActiveWidget(Panel_Empty);
 }
 
-void UEditorView_InGameTaskEditor::SetDetail_MARCH_ON()
+
+void UEditorView_InGameTaskEditor::SetDetail_MISSION()
 {
-	/*Switcher_Detail->SetActiveWidget(Panel_MarchOn);
+	Switcher_Detail->SetActiveWidget(Panel_Mission);
 	if (false == IsValid(EntryData))
 		return;
 
-	EntryData->IntegerParamList.Reserve(1);
-	if (false == EntryData->IntegerParamList.IsValidIndex(0))
+	// For MISSION type, we might use FMissionTaskData_Base or a specific multi-task data struct if added later.
+	// Currently it delegates to MissionTaskEditor.
+	if (IsValid(MissionTaskEditor))
 	{
-		EntryData->IntegerParamList.Emplace(0);
+		MissionTaskEditor->SetData(EntryData);
 	}
-
-	int32 id = EntryData->IntegerParamList[0];*/
-	
 }
 
-void UEditorView_InGameTaskEditor::SetDetail_SPAWN()
+void UEditorView_InGameTaskEditor::SetDetail_SPAWN_OBJECT()
 {
-	Switcher_Detail->SetActiveWidget(Panel_SPAWN);
+	Switcher_Detail->SetActiveWidget(Panel_SpawnObject);
 	if (false == IsValid(EntryData))
 		return;
 
-	/*EntryData->IntegerParamList.Reserve(2);
-	if (false == EntryData->IntegerParamList.IsValidIndex(0))
-		EntryData->IntegerParamList.Add(0);
-	int32 actorId = EntryData->IntegerParamList[0];
-	Txt_SpawnActorID->SetText(FText::AsNumber(actorId));
+	// Ensure the TaskDetail is initialized as FMissionTaskData_Object
+	if (!EntryData->TaskDetail.IsValid() || EntryData->TaskDetail.GetScriptStruct() != FMissionTaskData_Object::StaticStruct())
+	{
+		EntryData->TaskDetail.InitializeAs<FMissionTaskData_Object>();
+	}
 
-	if (false == EntryData->IntegerParamList.IsValidIndex(1))
-		EntryData->IntegerParamList.Add(0);
-	int32 monsterId = EntryData->IntegerParamList[1];
-	Txt_MonsterID->SetText(FText::AsNumber(monsterId));*/
+	FMissionTaskData_Object* Data = EntryData->TaskDetail.GetMutablePtr<FMissionTaskData_Object>();
+	if (Data)
+	{
+		// Update UI with Data->ActorID (Assuming there's a UI element for this, using Txt_SpawnActorID as placeholder if needed or just logging)
+		// For now, let's just ensure the data exists.
+	}
+}
+
+void UEditorView_InGameTaskEditor::SetDetail_SPAWN_MONSTER()
+{
+	Switcher_Detail->SetActiveWidget(Panel_SpawnMonster);
+	if (false == IsValid(EntryData))
+		return;
+
+	//SpawnMonster->SetData(EntryData);
+
+	// Ensure the TaskDetail is initialized as FMissionTaskData_Spawn
+	//if (!EntryData->TaskDetail.IsValid() || EntryData->TaskDetail.GetScriptStruct() != FMissionTaskData_Spawn::StaticStruct())
+	//{
+	//	EntryData->TaskDetail.InitializeAs<FMissionTaskData_Spawn>();
+	//}
+
+	/*FMissionTaskData_Spawn* Data = EntryData->TaskDetail.GetMutablePtr<FMissionTaskData_Spawn>();
+	if (Data)
+	{
+		Txt_SpawnActorID->SetText(FText::AsNumber(Data->ActorID));
+		Txt_MonsterID->SetText(FText::AsNumber(Data->MonsterID));
+	}*/
 }
 #pragma endregion
 
@@ -184,7 +181,7 @@ void UEditorView_InGameTaskEditor::SetData(UEntryData_InGameTaskList* inEntryDat
 	TextBox_Desc->SetText(FText::FromString(EntryData->Desc));
 
 	FString strType = TEXT("NONE");
-	const UEnum* ptrEnum = FindObject<UEnum>(ANY_PACKAGE, TEXT("EInGameTaskType"), true);
+	const UEnum* ptrEnum = StaticEnum<EInGameTaskType>();
 	if (ptrEnum)
 	{
 		strType = ptrEnum->GetNameStringByValue((int64)EntryData->Type);
@@ -222,6 +219,14 @@ void UEditorView_InGameTaskEditor::OnSelectedMonster()
 	SetDetail();
 }
 
+void UEditorView_InGameTaskEditor::OnClicked_Close()
+{
+	if (false == OnClosedEvent.IsBound())
+		return;
+
+	OnClosedEvent.Execute(this);
+}
+
 void UEditorView_InGameTaskEditor::OnClicked_Save()
 {
 	if (false == IsValid(EntryData))
@@ -229,10 +234,10 @@ void UEditorView_InGameTaskEditor::OnClicked_Save()
 
 	FString strTitle = TextBox_Title->GetText().ToString();
 	FString strDesc = TextBox_Desc->GetText().ToString();
-	int32 step = FCString::Atof(*TextBox_Step->GetText().ToString());
-	//int32 index = FCString::Atoi(*Txt_TileIndex->GetText().ToString());
+	int32 step = FCString::Atoi(*TextBox_Step->GetText().ToString()); // Fix: Atof to Atoi
+	
 	EInGameTaskType type = EInGameTaskType::NONE;
-	const UEnum* ptrEnum = FindObject<UEnum>(ANY_PACKAGE, TEXT("EInGameTaskType"), true);
+	const UEnum* ptrEnum = StaticEnum<EInGameTaskType>();
 	if (ptrEnum)
 	{
 		FName typeName = FName(*ComboBox_Type->GetSelectedOption());
@@ -243,7 +248,17 @@ void UEditorView_InGameTaskEditor::OnClicked_Save()
 	EntryData->Desc = strDesc;
 	EntryData->Step = step;
 	EntryData->Type = type;
-	//EntryData->Index = index;
+	//EntryData->TaskDetail
+	// Save task-specific details back to the instanced struct
+	if (type == EInGameTaskType::SPAWN_OBJECT || type == EInGameTaskType::SPAWN_MONSTER)
+	{
+		//FMissionTaskData_Spawn* Data = EntryData->TaskDetail.GetMutablePtr<FMissionTaskData_Spawn>();
+		//if (Data)
+		//{
+		//	Data->ActorID = FCString::Atoi(*Txt_SpawnActorID->GetText().ToString());
+		//	Data->MonsterID = FCString::Atoi(*Txt_MonsterID->GetText().ToString());
+		//}
+	}
 	EntryData->RefreshUI();
 }
 
@@ -253,16 +268,11 @@ void UEditorView_InGameTaskEditor::OnChanged_TaskType(FString inSelectedItem, ES
 		return;
 
 	EInGameTaskType type = EInGameTaskType::NONE;
-	const UEnum* ptrEnum = FindObject<UEnum>(ANY_PACKAGE, TEXT("EInGameTaskType"), true);
+	const UEnum* ptrEnum = StaticEnum<EInGameTaskType>();
 	if (ptrEnum)
 	{
 		FName typeName = FName(*ComboBox_Type->GetSelectedOption());
 		EntryData->Type = StaticCast<EInGameTaskType>(ptrEnum->GetValueByName(typeName));
 		SetDetail();
 	}
-}
-
-void UEditorView_InGameTaskEditor::OnChanged_TileIndex(FString inSelectedItem, ESelectInfo::Type inSelectType)
-{
-
 }

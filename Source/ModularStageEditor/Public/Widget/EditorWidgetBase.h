@@ -9,11 +9,18 @@
 #include "EditorWidgetBase.generated.h"
 
 class FName;
+class FDelegateHandle;
 
 UCLASS(Abstract)
 class MODULARSTAGEEDITOR_API UEditorWidgetBase : public UEditorUtilityWidget
 {
     GENERATED_BODY()
+protected:
+    virtual void NativeConstruct() override; // 등록하는 곳
+    virtual void BeginDestroy() override;    // 해제하는 곳
+    virtual void OnEditorExit_Implement();
+private:
+    void OnEditorExit(); // 실제 청소부 함수
 
 public:
     // Default implementation for menu name.
@@ -73,5 +80,10 @@ public:
 
         UEditorUtilityWidget* CreatedWidget = EditorWidgetBlueprint->GetCreatedWidget();
         return Cast<TEditorWidget>(CreatedWidget);
+
+    
     }
+
+protected:
+    FDelegateHandle OnExitHandle; // 등록증
 };

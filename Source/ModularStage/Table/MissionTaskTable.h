@@ -6,7 +6,10 @@
 #include "UObject/ObjectMacros.h"
 #include "UObject/Package.h"
 #include "TableRowBase.h"
+#include "ModularStage/Table/TableEnum.h"
 
+#include "InstancedStruct.h"
+#include "MissionTaskData.h"
 #include "MissionTaskTable.generated.h"
 
 
@@ -35,10 +38,13 @@ public:
 	FGuid SerializeID;
 
 	UPROPERTY(EditAnywhere)
-	TArray <int32> IntegerParamList;
+	EInGameTaskType Type;
 
 	UPROPERTY(EditAnywhere)
-	TArray <FString> StringParamList;
+	EMissionObjectiveType ObjectiveType = EMissionObjectiveType::None;
+
+	UPROPERTY(EditAnywhere, meta=(BaseStruct="/Script/ModularStage.MissionTaskData_Base"))
+	FInstancedStruct TaskDetail;
 };
 
 
